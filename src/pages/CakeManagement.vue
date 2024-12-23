@@ -25,7 +25,7 @@
             <div class="text-6 text-center">
               {{ cake.name }}
             </div>
-            <v-img :width="100" :src="getImageUrl(cake.image_url)" />
+            <v-img :width="100" :src="cake.image_url" />
             <div class="d-flex justify-center">
               <v-row class="justify-center">
                 <v-col cols="12" md="5">
@@ -155,7 +155,6 @@
 import { ref, computed, onMounted } from 'vue';
 import api from '@/plugins/axios';
 import cakes from '@/data/cakes';
-import { getImageUrl } from '@/utils/images'
 
 const cakesInDatabase = ref([]);
 const dialog = ref(false);

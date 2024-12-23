@@ -11,6 +11,11 @@ import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
 
+// 새로 생성할 유틸리티 파일
+export const getImageUrl = (imageNumber) => {
+  return new URL(`../assets/cakes/${imageNumber}.png`, import.meta.url).href
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -70,18 +75,4 @@ export default defineConfig({
       },
     },
   },
-  build: {
-    assetsDir: 'assets',
-    rollupOptions: {
-      output: {
-        assetFileNames: (assetInfo) => {
-          const extType = assetInfo.name.split('.')[1]
-          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
-            return `assets/img/[name]-[hash][extname]`
-          }
-          return `assets/[name]-[hash][extname]`
-        },
-      }
-    }
-  }
 })

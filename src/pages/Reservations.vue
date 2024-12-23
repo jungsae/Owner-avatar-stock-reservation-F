@@ -263,7 +263,7 @@
           <v-row>
             <v-col v-for="cake in filteredAvailableCakes" :key="cake.cake_id" cols="12" sm="4" md="3">
               <v-card :ripple="false" outlined class="cake-card" @click="selectCake(cake)">
-                <v-img :src="cake.cakeInfo.image_url" class="cake-image" />
+                <v-img :src="getImageUrl(cake.cakeInfo.image_url.split('/').pop().split('.')[0])" class="cake-image" />
                 <v-card-text>
                   <h4>{{ cake.cakeInfo.name }}</h4>
                   <div class="quantity-selector">
@@ -467,6 +467,7 @@ import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import api from '@/plugins/axios';
+import { getImageUrl } from '@/utils/imageLoader';
 
 export default {
   components: {
@@ -670,7 +671,13 @@ export default {
       this.loading = true;
       try {
         const response = await api.get('/storeCakes');
-        this.availableCakes = response.data;
+        this.availableCakes = response.data.map(cake => ({
+          ...cake,
+          cakeInfo: {
+            ...cake.cakeInfo,
+            image_url: getImageUrl(cake.cakeInfo.image_url.split('/').pop().split('.')[0])
+          }
+        }));
       } catch (error) {
         console.error('Error fetching cakes:', error);
         this.showSnackbar('매장 케이크 정보를 불러오는데 실패했습니다.', 'error');
