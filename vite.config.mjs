@@ -70,4 +70,18 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        assetFileNames: (assetInfo) => {
+          const extType = assetInfo.name.split('.')[1]
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+            return `assets/img/[name]-[hash][extname]`
+          }
+          return `assets/[name]-[hash][extname]`
+        },
+      }
+    }
+  }
 })

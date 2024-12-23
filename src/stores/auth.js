@@ -18,9 +18,7 @@ export const useAuthStore = defineStore('auth', {
 
             this.setUserFromToken();
 
-            const redirectPath = localStorage.getItem('redirectPath') || '/';
-            localStorage.removeItem('redirectPath');
-            router.push(redirectPath);
+            router.push('/');
 
             return this.user;
         },
