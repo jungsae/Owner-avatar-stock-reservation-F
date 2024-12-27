@@ -11,11 +11,6 @@ import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
 
-// 새로 생성할 유틸리티 파일
-export const getImageUrl = (imageNumber) => {
-  return new URL(`../assets/cakes/${imageNumber}.png`, import.meta.url).href
-}
-
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
