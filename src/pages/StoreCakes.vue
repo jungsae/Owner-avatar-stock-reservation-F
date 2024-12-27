@@ -40,7 +40,7 @@
               <h4>{{ cake.cakeInfo.name }}</h4>
               <div><strong>재고:</strong> {{ cake.stock }}</div>
             </v-card-text>
-            <v-img :src="getImageUrl(cake.image_url.split('/').pop().split('.')[0])" max-height="120" max-width="100%" class="cake-image" />
+            <v-img :src="getImageSrc(cake.image_url)" max-height="120" max-width="100%" class="cake-image" />
             <h5><strong>{{ cake.cakeInfo.description }}</strong></h5>
             <v-card-actions class="d-flex justify-space-between align-center action-buttons">
               <v-btn size="large" color="#7d95e3" @click="openEditStockDialog(cake)">
@@ -184,18 +184,22 @@ const groupedCakes = computed(() => {
   };
 
   filteredCakes.value.forEach((cake) => {
-    // 이미지 URL에서 숫자 추출 (예: "1.png"에서 1 추출)
+    if (!cake.cakeInfo?.image_url) return; // 이미지 URL이 없는 경우 스킵
+
+    // 이미지 번호 추출
     const imageNumber = parseInt(cake.cakeInfo.image_url.split('/').pop().split('.')[0], 10);
+    
+    // 유효한 이미지 번호인 경우에만 처리
+    if (!isNaN(imageNumber)) {
+      cake.cakeInfo.image_url = getImageUrl(imageNumber);
 
-    // 이미지 URL을 새로운 방식으로 변환
-    cake.cakeInfo.image_url = getImageUrl(imageNumber);
-
-    if (imageNumber >= 1 && imageNumber <= 49) {
-      sections.케이크.push(cake);
-    } else if (imageNumber >= 50 && imageNumber <= 99) {
-      sections.떠먹는케이크.push(cake);
-    } else if (imageNumber >= 100 && imageNumber <= 150) {
-      sections.피스케이크.push(cake);
+      if (imageNumber >= 1 && imageNumber <= 49) {
+        sections.케이크.push(cake);
+      } else if (imageNumber >= 50 && imageNumber <= 99) {
+        sections.떠먹는케이크.push(cake);
+      } else if (imageNumber >= 100 && imageNumber <= 150) {
+        sections.피스케이크.push(cake);
+      }
     }
   });
 
@@ -324,6 +328,18 @@ const removeCake = async () => {
     showSnackbar('케이크 삭제에 실패했습니다', error.data.message);
   }
 };
+
+// 이미지 URL을 처리하는 부분에 안전장치 추가
+const getImageSrc = (imageUrl) => {
+  if (!imageUrl) return ''; // 이미지 URL이 없는 경우 빈 문자열 반환
+  try {
+    const imageNumber = imageUrl.split('/').pop().split('.')[0];
+    return getImageUrl(imageNumber);
+  } catch (error) {
+    console.error('Error processing image URL:', error);
+    return ''; // 에러 발생 시 빈 문자열 반환
+  }
+}
 
 onMounted(async () => {
   await fetchStoreCakes();
