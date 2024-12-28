@@ -41,8 +41,7 @@
               <div><strong>재고:</strong> {{ cake.stock }}</div>
             </v-card-text>
             <div>{{ console.log(cake.cakeInfo.image_url) }}</div>
-            <v-img v-if="cake.cakeInfo?.image_url" :src="getImageUrl(cake.cakeInfo.image_url)" max-height="120"
-              max-width="100%" class="cake-image" />
+            <v-img :src="getImageUrl(cake.cakeInfo.image_url)" max-height="120" max-width="100%" class="cake-image" />
             <h5><strong>{{ cake.cakeInfo.description }}</strong></h5>
             <v-card-actions class="d-flex justify-space-between align-center action-buttons">
               <v-btn size="large" color="#7d95e3" @click="openEditStockDialog(cake)">
@@ -191,7 +190,7 @@ const groupedCakes = computed(() => {
     if (!cake.cakeInfo?.image_url) return; // 이미지 URL이 없는 경우 스킵
 
     // 이미지 번호 추출
-    const imageNumber = parseInt(cake.cakeInfo.image_url.split('/').pop().split('.')[0], 10);
+    const imageNumber = parseInt(cake.cakeInfo.image_url);
 
     // 유효한 이미지 번호인 경우에만 처리
     if (!isNaN(imageNumber)) {
