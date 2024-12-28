@@ -25,7 +25,7 @@
             <div class="text-6 text-center">
               {{ cake.name }}
             </div>
-            <v-img :width="100" :src="cake.image" />
+            <v-img :width="100" :src="cake.image_url" />
             <div class="d-flex justify-center">
               <v-row class="justify-center">
                 <v-col cols="12" md="5">
