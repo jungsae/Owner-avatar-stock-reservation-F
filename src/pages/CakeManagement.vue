@@ -105,7 +105,7 @@
       <v-card class="mx-auto">
         <v-card-title>{{ selectedCake.name }}</v-card-title>
         <v-card-text>
-          <v-img :src="selectedCake.image_url" max-width="180" class="mx-auto" />
+          <v-img :src="getImageUrl(selectedCake.image_url)" max-width="180" class="mx-auto" />
           <div><strong>가격:</strong> {{ selectedCake.price }}원</div>
           <div><strong>설명:</strong> {{ selectedCake.description }}</div>
           <div><strong>등록일:</strong> {{ new Date(selectedCake.createdAt).toLocaleString('ko-KR', {
@@ -258,16 +258,9 @@ const confirmDelete = (cake) => {
 };
 
 const selectName = (cake) => {
-  console.log("cake", cake)
-  console.log("cake.image", cake.image)
-  console.log("cake.image.match", cake.image.match(/\d+/))
-  console.log("cake.image.match[0]", cake.image.match(/\d+/)[0])
-  console.log("cake.image.split", cake.image.split('/').pop().split('-')[0])
-  console.log("cake.image.split[0]", cake.image.split('/').pop().split('-')[0])
-
   form.value.name = cake.name;
-  const imageNumber = cake.image.match(/\d+/)[0];
-  form.value.image_url = imageNumber;
+  const number = cake.image.match(/\d+/)[0];
+  form.value.image_url = number;
   closeNameSelectDialog();
 };
 
