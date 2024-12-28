@@ -133,7 +133,7 @@
           <v-row dense>
             <v-col v-for="cake in cakes" :key="cake.name" cols="6" md="4" lg="3" class="d-flex align-center mb-2">
               <v-card outlined class="d-flex flex-column align-center pa-2" @click="selectName(cake)">
-                <v-img :src="getImageUrl(cake.image)" max-height="100" max-width="100" class="mb-2" />
+                <v-img :src="cake.image" max-height="100" max-width="100" class="mb-2" />
                 <div class="text-h6 text-center">
                   {{ cake.name }}
                 </div>
