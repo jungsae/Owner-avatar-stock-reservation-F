@@ -100,12 +100,14 @@
       </v-card>
     </v-dialog>
 
-    <!-- 케이크 자세히 보기 다이얼로그 -->
+    <!-- 케이크 상세보기 -->
     <v-dialog v-model="detailDialog" max-width="400px">
       <v-card class="mx-auto">
         <v-card-title>{{ selectedCake.name }}</v-card-title>
         <v-card-text>
-          <v-img :src="selectedCake.image_url" max-width="180" class="mx-auto" />
+          <div>{{ console.log("selectedCake", selectedCake) }}</div>
+          <div>{{ console.log("selectedCake.image_url", selectedCake.image_url) }}</div>
+          <v-img :src="getImageUrl(selectedCake.image_url)" max-width="180" class="mx-auto" />
           <div><strong>가격:</strong> {{ selectedCake.price }}원</div>
           <div><strong>설명:</strong> {{ selectedCake.description }}</div>
           <div><strong>등록일:</strong> {{ new Date(selectedCake.createdAt).toLocaleString('ko-KR', {
