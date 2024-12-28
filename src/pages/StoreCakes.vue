@@ -40,7 +40,8 @@
               <h4>{{ cake.cakeInfo.name }}</h4>
               <div><strong>재고:</strong> {{ cake.stock }}</div>
             </v-card-text>
-            <v-img :src="getCakeImageUrl(cake.image_url)" max-height="120" max-width="100%" class="cake-image" />
+            <v-img :src="getImageUrl(cake.image_url.split('/').pop().split('.')[0])" max-height="120" max-width="100%"
+              class="cake-image" />
             <h5><strong>{{ cake.cakeInfo.description }}</strong></h5>
             <v-card-actions class="d-flex justify-space-between align-center action-buttons">
               <v-btn size="large" color="#7d95e3" @click="openEditStockDialog(cake)">
