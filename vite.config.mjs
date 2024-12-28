@@ -25,14 +25,20 @@ export default defineConfig({
       styles: {
         configFile: 'src/styles/settings.scss',
       },
+      fonts: {
+        defaultFontDirectory: 'assets/fonts',
+        preload: true,
+      }
     }),
     Components(),
     Fonts({
       google: {
+        preload: true,
         families: [{
           name: 'Roboto',
           styles: 'wght@100;300;400;500;700;900',
         }],
+        display: 'swap',
       },
     }),
     AutoImport({
