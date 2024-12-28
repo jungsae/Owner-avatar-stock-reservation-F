@@ -25,6 +25,7 @@
             <div class="text-6 text-center">
               {{ cake.name }}
             </div>
+            <div>{{ console.log("cccc", cake.image_url) }}</div>
             <v-img :width="100" :src="cake.image_url" />
             <div class="d-flex justify-center">
               <v-row class="justify-center">
