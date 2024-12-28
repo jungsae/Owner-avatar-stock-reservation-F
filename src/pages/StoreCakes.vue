@@ -41,8 +41,7 @@
               <div><strong>재고:</strong> {{ cake.stock }}</div>
             </v-card-text>
             <div>{{ console.log(cake.cakeInfo.image_url) }}</div>
-            <v-img v-if="cake.cakeInfo?.image_url"
-              :src="getImageUrl(cake.cakeInfo.image_url.split('/').pop().split('.')[0])" max-height="120"
+            <v-img v-if="cake.cakeInfo?.image_url" :src="getImageUrl(cake.cakeInfo.image_url)" max-height="120"
               max-width="100%" class="cake-image" />
             <h5><strong>{{ cake.cakeInfo.description }}</strong></h5>
             <v-card-actions class="d-flex justify-space-between align-center action-buttons">
@@ -517,8 +516,7 @@ onMounted(async () => {
     gap: 1px;
   }
 
-  .v-btn {
-    text-align: center;
+  .v-btn {    text-align: center;
   }
 }
 </style>
