@@ -25,7 +25,7 @@
             <div class="text-6 text-center">
               {{ cake.name }}
             </div>
-            <v-img :width="100" :src="getImageUrl(cake.image_url.split('/').pop().split('.')[0])" />
+            <v-img :width="100" :src="cake.image" />
             <div class="d-flex justify-center">
               <v-row class="justify-center">
                 <v-col cols="12" md="5">
@@ -84,7 +84,7 @@
               이름 선택
             </v-btn>
             <v-text-field v-model="form.name" label="케이크 이름" outlined dense required readonly />
-            <v-img v-if="form.image_url" :src="displayImageUrl" max-height="180" max-width="500" class="mx-0" />
+            <v-img :src="getImageUrl(form.image_url)" max-height="180" max-width="500" class="mx-0" />
             <v-text-field v-model="form.price" label="가격" type="number" outlined dense required />
             <v-textarea v-model="form.description" label="설명" outlined dense required />
           </v-form>
@@ -263,14 +263,6 @@ const selectName = (cake) => {
   form.value.image_url = number;
   closeNameSelectDialog();
 };
-
-const displayImageUrl = computed(() => {
-  if (!form.value.image_url) return '';
-  const imageNumber = String(form.value.image_url).match(/\d+/)?.[0] || '';
-  if (!imageNumber) return '';
-
-  return getImageUrl(imageNumber);
-});
 
 const saveCake = async () => {
   try {
