@@ -40,6 +40,7 @@
               <h4>{{ cake.cakeInfo.name }}</h4>
               <div><strong>재고:</strong> {{ cake.stock }}</div>
             </v-card-text>
+            <div>{{ console.log(cake.cakeInfo.image_url) }}</div>
             <v-img v-if="cake.cakeInfo?.image_url"
               :src="getImageUrl(cake.cakeInfo.image_url.split('/').pop().split('.')[0])" max-height="120"
               max-width="100%" class="cake-image" />
