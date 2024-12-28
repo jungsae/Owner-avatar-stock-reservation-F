@@ -25,26 +25,14 @@ export default defineConfig({
       styles: {
         configFile: 'src/styles/settings.scss',
       },
-      fonts: {
-        defaultFontDirectory: 'assets/fonts',
-        preload: false,
-      },
+      fonts: false,
       icons: {
         defaultSet: 'mdi',
         iconfont: 'mdi',
+        preload: false,
       }
     }),
     Components(),
-    Fonts({
-      google: {
-        preload: false,
-        families: [{
-          name: 'Roboto',
-          styles: 'wght@100;300;400;500;700;900',
-        }],
-        display: 'swap',
-      },
-    }),
     AutoImport({
       imports: [
         'vue',
