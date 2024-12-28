@@ -40,7 +40,7 @@
               <h4>{{ cake.cakeInfo.name }}</h4>
               <div><strong>재고:</strong> {{ cake.stock }}</div>
             </v-card-text>
-            <div>{{ console.log(cake.cakeInfo.image_url) }}</div>
+            <div>{{ console.log("cake.cakeInfo.image_url", cake.cakeInfo) }}</div>
             <v-img :src="getImageUrl(cake.cakeInfo.image_url)" max-height="120" max-width="100%" class="cake-image" />
             <h5><strong>{{ cake.cakeInfo.description }}</strong></h5>
             <v-card-actions class="d-flex justify-space-between align-center action-buttons">
@@ -68,8 +68,7 @@
               <v-card outlined max-height="95" max-width="180" variant="plain"
                 class="d-flex flex-column align-center pa-1" :class="{ 'selected-cake': selectedCake === cake.id }"
                 @click="selectCake(cake)">
-                <img v-if="cake?.image_url" :src="getImageUrl(cake.image_url.split('/').pop().split('.')[0])"
-                  height="60" width="70" class="mb-1">
+                <img :src="getImageUrl(cake.image_url)" height="60" width="70" class="mb-1">
                 <div style="font-size: 62%; text-align: center; font-weight: bold;">
                   {{ cake.name }}
                 </div>
@@ -186,7 +185,6 @@ const groupedCakes = computed(() => {
   };
 
   filteredCakes.value.forEach((cake) => {
-    console.log("cake", cake)
     if (!cake.cakeInfo?.image_url) return; // 이미지 URL이 없는 경우 스킵
 
     // 이미지 번호 추출
@@ -194,8 +192,6 @@ const groupedCakes = computed(() => {
 
     // 유효한 이미지 번호인 경우에만 처리
     if (!isNaN(imageNumber)) {
-      console.log("getImageUrl(imageNumber)", getImageUrl(imageNumber))
-      cake.cakeInfo.image_url = getImageUrl(imageNumber);
 
       if (imageNumber >= 1 && imageNumber <= 49) {
         sections.케이크.push(cake);
