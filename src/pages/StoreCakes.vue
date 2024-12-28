@@ -40,7 +40,8 @@
               <h4>{{ cake.cakeInfo.name }}</h4>
               <div><strong>재고:</strong> {{ cake.stock }}</div>
             </v-card-text>
-            <v-img :src="getImageSrc(cake.image_url)" max-height="120" max-width="100%" class="cake-image" />
+            <v-img :src="getImageUrl(cake.image_url.split('/').pop().split('.')[0])" max-height="120" max-width="100%"
+              class="cake-image" />
             <h5><strong>{{ cake.cakeInfo.description }}</strong></h5>
             <v-card-actions class="d-flex justify-space-between align-center action-buttons">
               <v-btn size="large" color="#7d95e3" @click="openEditStockDialog(cake)">
@@ -67,7 +68,8 @@
               <v-card outlined max-height="95" max-width="180" variant="plain"
                 class="d-flex flex-column align-center pa-1" :class="{ 'selected-cake': selectedCake === cake.id }"
                 @click="selectCake(cake)">
-                <img :src="getImageUrl(cake.image_url.split('/').pop().split('.')[0])" height="60" width="70" class="mb-1">
+                <img :src="getImageUrl(cake.image_url.split('/').pop().split('.')[0])" height="60" width="70"
+                  class="mb-1">
                 <div style="font-size: 62%; text-align: center; font-weight: bold;">
                   {{ cake.name }}
                 </div>
@@ -188,7 +190,7 @@ const groupedCakes = computed(() => {
 
     // 이미지 번호 추출
     const imageNumber = parseInt(cake.cakeInfo.image_url.split('/').pop().split('.')[0], 10);
-    
+
     // 유효한 이미지 번호인 경우에만 처리
     if (!isNaN(imageNumber)) {
       cake.cakeInfo.image_url = getImageUrl(imageNumber);
@@ -328,18 +330,6 @@ const removeCake = async () => {
     showSnackbar('케이크 삭제에 실패했습니다', error.data.message);
   }
 };
-
-// 이미지 URL을 처리하는 부분에 안전장치 추가
-const getImageSrc = (imageUrl) => {
-  if (!imageUrl) return ''; // 이미지 URL이 없는 경우 빈 문자열 반환
-  try {
-    const imageNumber = imageUrl.split('/').pop().split('.')[0];
-    return getImageUrl(imageNumber);
-  } catch (error) {
-    console.error('Error processing image URL:', error);
-    return ''; // 에러 발생 시 빈 문자열 반환
-  }
-}
 
 onMounted(async () => {
   await fetchStoreCakes();
