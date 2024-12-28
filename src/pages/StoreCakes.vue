@@ -194,6 +194,7 @@ const groupedCakes = computed(() => {
 
     // 유효한 이미지 번호인 경우에만 처리
     if (!isNaN(imageNumber)) {
+      console.log("getImageUrl(imageNumber)", getImageUrl(imageNumber))
       cake.cakeInfo.image_url = getImageUrl(imageNumber);
 
       if (imageNumber >= 1 && imageNumber <= 49) {
