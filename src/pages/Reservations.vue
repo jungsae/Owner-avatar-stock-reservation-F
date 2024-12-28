@@ -37,7 +37,7 @@
     </div>
 
     <!-- 예약 수정 모달 -->
-    <v-dialog v-model="editDialog" max-width="800px">
+    <v-dialog v-model="editDialog" max-width="800px" width="100%">
       <v-card>
         <v-card-title>예약 수정</v-card-title>
         <v-card-text>
