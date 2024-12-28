@@ -146,7 +146,7 @@
     </v-dialog>
 
     <!-- 예약 등록 모달 -->
-    <v-dialog v-model="addDialog" max-width="800px">
+    <v-dialog v-model="addDialog" max-width="800px" width="100%">
       <v-card>
         <v-card-title>예약 등록</v-card-title>
         <v-card-text>
