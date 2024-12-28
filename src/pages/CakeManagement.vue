@@ -258,6 +258,13 @@ const confirmDelete = (cake) => {
 };
 
 const selectName = (cake) => {
+  console.log("cake", cake)
+  console.log("cake.image", cake.image)
+  console.log("cake.image.match", cake.image.match(/\d+/))
+  console.log("cake.image.match[0]", cake.image.match(/\d+/)[0])
+  console.log("cake.image.split", cake.image.split('/').pop().split('-')[0])
+  console.log("cake.image.split[0]", cake.image.split('/').pop().split('-')[0])
+
   form.value.name = cake.name;
   const imageNumber = cake.image.match(/\d+/)[0];
   form.value.image_url = imageNumber;
