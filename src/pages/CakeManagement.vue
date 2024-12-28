@@ -105,8 +105,6 @@
       <v-card class="mx-auto">
         <v-card-title>{{ selectedCake.name }}</v-card-title>
         <v-card-text>
-          <div>{{ console.log("selectedCake", selectedCake) }}</div>
-          <div>{{ console.log("selectedCake.image_url", selectedCake.image_url) }}</div>
           <v-img :src="getImageUrl(selectedCake.image_url)" max-width="180" class="mx-auto" />
           <div><strong>가격:</strong> {{ selectedCake.price }}원</div>
           <div><strong>설명:</strong> {{ selectedCake.description }}</div>

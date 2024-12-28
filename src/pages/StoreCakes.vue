@@ -187,6 +187,7 @@ const groupedCakes = computed(() => {
   };
 
   filteredCakes.value.forEach((cake) => {
+    console.log("cake", cake)
     if (!cake.cakeInfo?.image_url) return; // 이미지 URL이 없는 경우 스킵
 
     // 이미지 번호 추출
@@ -516,7 +517,8 @@ onMounted(async () => {
     gap: 1px;
   }
 
-  .v-btn {    text-align: center;
+  .v-btn {
+    text-align: center;
   }
 }
 </style>
