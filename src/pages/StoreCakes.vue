@@ -283,11 +283,16 @@ const addCake = async () => {
       return;
     }
 
+    console.log('선택된 케이크 정보:', selectedCake.value);
+    console.log('선택된 케이크의 이미지 URL:', availableCakes.value.find(cake => cake.id === selectedCake.value)?.image_url);
+
     // 서버에 재고 추가 요청
-    await api.post('/storeCakes', {
+    const response = await api.post('/storeCakes', {
       cake_id: selectedCake.value,
       stock: newStock.value,
     });
+
+    console.log('서버 응답:', response.data);
 
     showSnackbar('재고가 성공적으로 등록되었습니다!', 'success');
     await fetchStoreCakes();

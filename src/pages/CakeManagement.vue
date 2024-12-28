@@ -84,7 +84,7 @@
               이름 선택
             </v-btn>
             <v-text-field v-model="form.name" label="케이크 이름" outlined dense required readonly />
-            <v-img v-if="form.image_url" :src="form.image_url" max-height="180" max-width="500" class="mx-0" />
+            <v-img v-if="form.image_url" :src="displayImageUrl" max-height="180" max-width="500" class="mx-0" />
             <v-text-field v-model="form.price" label="가격" type="number" outlined dense required />
             <v-textarea v-model="form.description" label="설명" outlined dense required />
           </v-form>
@@ -155,6 +155,7 @@
 import { ref, computed, onMounted } from 'vue';
 import api from '@/plugins/axios';
 import cakes from '@/data/cakes';
+import { getImageUrl } from '@/utils/imageLoader';
 
 const cakesInDatabase = ref([]);
 const dialog = ref(false);
@@ -258,9 +259,15 @@ const confirmDelete = (cake) => {
 
 const selectName = (cake) => {
   form.value.name = cake.name;
-  form.value.image_url = cake.image;
+  const imageNumber = cake.image.split('/').pop().split('.')[0];
+  form.value.image_url = imageNumber;
   closeNameSelectDialog();
 };
+
+const displayImageUrl = computed(() => {
+  if (!form.value.image_url) return '';
+  return getImageUrl(form.value.image_url);
+});
 
 const saveCake = async () => {
   try {
