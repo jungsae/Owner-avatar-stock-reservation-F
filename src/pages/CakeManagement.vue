@@ -259,14 +259,26 @@ const confirmDelete = (cake) => {
 
 const selectName = (cake) => {
   form.value.name = cake.name;
+  console.log('선택된 케이크 이미지:', cake.image);  // 디버깅용
   const imageNumber = cake.image.split('/').pop().split('.')[0];
+  console.log('추출된 이미지 번호:', imageNumber);  // 디버깅용
   form.value.image_url = imageNumber;
   closeNameSelectDialog();
 };
 
 const displayImageUrl = computed(() => {
+  console.log('현재 form.image_url:', form.value.image_url);  // 디버깅용
   if (!form.value.image_url) return '';
-  return getImageUrl(form.value.image_url);
+
+  // 이미 숫자만 있는 경우와 전체 경로가 있는 경우를 모두 처리
+  const imageNumber = typeof form.value.image_url === 'string' && form.value.image_url.includes('/')
+    ? form.value.image_url.split('/').pop().split('.')[0]
+    : form.value.image_url;
+
+  console.log('변환된 이미지 번호:', imageNumber);  // 디버깅용
+  const url = getImageUrl(imageNumber);
+  console.log('최종 URL:', url);  // 디버깅용
+  return url;
 });
 
 const saveCake = async () => {
