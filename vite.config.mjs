@@ -27,13 +27,17 @@ export default defineConfig({
       },
       fonts: {
         defaultFontDirectory: 'assets/fonts',
-        preload: true,
+        preload: false,
+      },
+      icons: {
+        defaultSet: 'mdi',
+        iconfont: 'mdi',
       }
     }),
     Components(),
     Fonts({
       google: {
-        preload: true,
+        preload: false,
         families: [{
           name: 'Roboto',
           styles: 'wght@100;300;400;500;700;900',
