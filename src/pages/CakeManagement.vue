@@ -25,7 +25,7 @@
             <div class="text-6 text-center">
               {{ cake.name }}
             </div>
-            <v-img :width="100" :src="getCakeImageUrl(cake.image_url)" />
+            <v-img :width="100" :src="getImageUrl(cake.image_url.split('/').pop().split('.')[0])" />
             <div class="d-flex justify-center">
               <v-row class="justify-center">
                 <v-col cols="12" md="5">
@@ -297,13 +297,6 @@ const deleteConfirmedCake = async () => {
   } finally {
     closeDeleteDialog();
   }
-};
-
-// 케이크 이미지 URL 변환을 위한 computed 속성
-const getCakeImageUrl = (imageUrl) => {
-  if (!imageUrl) return '';
-  const imageNumber = String(imageUrl).match(/\d+/)?.[0] || '';
-  return getImageUrl(imageNumber);
 };
 
 onMounted(fetchCakesFromDatabase);

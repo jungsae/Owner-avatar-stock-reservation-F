@@ -40,8 +40,9 @@
               <h4>{{ cake.cakeInfo.name }}</h4>
               <div><strong>재고:</strong> {{ cake.stock }}</div>
             </v-card-text>
-            <v-img :src="getImageUrl(cake.image_url.split('/').pop().split('.')[0])" max-height="120" max-width="100%"
-              class="cake-image" />
+            <v-img v-if="cake.cakeInfo?.image_url"
+              :src="getImageUrl(cake.cakeInfo.image_url.split('/').pop().split('.')[0])" max-height="120"
+              max-width="100%" class="cake-image" />
             <h5><strong>{{ cake.cakeInfo.description }}</strong></h5>
             <v-card-actions class="d-flex justify-space-between align-center action-buttons">
               <v-btn size="large" color="#7d95e3" @click="openEditStockDialog(cake)">
@@ -68,8 +69,8 @@
               <v-card outlined max-height="95" max-width="180" variant="plain"
                 class="d-flex flex-column align-center pa-1" :class="{ 'selected-cake': selectedCake === cake.id }"
                 @click="selectCake(cake)">
-                <img :src="getImageUrl(cake.image_url.split('/').pop().split('.')[0])" height="60" width="70"
-                  class="mb-1">
+                <img v-if="cake?.image_url" :src="getImageUrl(cake.image_url.split('/').pop().split('.')[0])"
+                  height="60" width="70" class="mb-1">
                 <div style="font-size: 62%; text-align: center; font-weight: bold;">
                   {{ cake.name }}
                 </div>
