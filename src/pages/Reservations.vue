@@ -263,8 +263,7 @@
           <v-row>
             <v-col v-for="cake in filteredAvailableCakes" :key="cake.cake_id" cols="12" sm="4" md="3">
               <v-card :ripple="false" outlined class="cake-card" @click="selectCake(cake)">
-                <div>{{ console.log(cake) }}</div>
-                <v-img :src="getImageUrl(cake.cakeInfo.image_url)" class="cake-image" />
+                <v-img :src="cake.cakeInfo.image_url" class="cake-image" />
                 <v-card-text>
                   <h4>{{ cake.cakeInfo.name }}</h4>
                   <div class="quantity-selector">
@@ -676,7 +675,7 @@ export default {
           ...cake,
           cakeInfo: {
             ...cake.cakeInfo,
-            image_url: cake.cakeInfo?.image_url ? cake.cakeInfo.image_url : ''
+            image_url: cake.cakeInfo?.image_url ? getImageUrl(cake.cakeInfo.image_url) : ''
           }
         }));
       } catch (error) {
