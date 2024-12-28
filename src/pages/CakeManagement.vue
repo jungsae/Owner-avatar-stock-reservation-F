@@ -260,17 +260,13 @@ const confirmDelete = (cake) => {
 const selectName = (cake) => {
   form.value.name = cake.name;
   const imageNumber = cake.image.match(/\d+/)[0];
-  console.log('추출된 이미지 번호:', imageNumber);
   form.value.image_url = imageNumber;
   closeNameSelectDialog();
 };
 
 const displayImageUrl = computed(() => {
   if (!form.value.image_url) return '';
-
   const imageNumber = String(form.value.image_url).match(/\d+/)?.[0] || '';
-  console.log('변환된 이미지 번호:', imageNumber);
-
   if (!imageNumber) return '';
 
   return getImageUrl(imageNumber);
