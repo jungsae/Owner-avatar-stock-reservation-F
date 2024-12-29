@@ -1,15 +1,5 @@
 <template>
-  <v-footer
-    height="60"
-    class="custom-footer"
-  >
-    <div class="footer-content">
-      <span>문의 </span>
-    </div>
-
-    <div class="footer-contact">
-      <span> Email</span>
-    </div>
+  <v-footer height="60" class="custom-footer">
   </v-footer>
 </template>
 

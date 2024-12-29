@@ -659,7 +659,7 @@ h1 {
 /* 버튼 반응형 스타일 */
 .filter-button,
 .excel-button {
-  min-width: 100px;
+  min-width: 60px;
   font-weight: 500;
   text-transform: none;
   letter-spacing: 0;

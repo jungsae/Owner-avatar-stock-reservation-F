@@ -284,11 +284,16 @@
     </v-dialog>
 
     <!-- 예약 상세 모달 -->
-    <v-dialog v-model="dialog" max-width="800px">
+    <v-dialog v-model="dialog" max-width="800px" @update:model-value="handleDialogClose">
       <v-card>
         <v-card-title class="reservation-header text-h6 font-weight-bold"
           style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-          <div>예약 내역 ({{ selectedDate }})</div>
+          <div>
+            <p>예약 내역 ({{ selectedDate }})</p>
+            <v-btn style="width: 100%;" color="green" @click="openAddReservationDialog">
+              예약추가
+            </v-btn>
+          </div>
           <div class="controls" style="display: flex; align-items: center; gap: 8px;">
             <v-checkbox v-model="hideCancelled" label="예약 취소 숨기기" @change="filterReservations" dense hide-details />
             <v-btn icon @click="toggleSortOrder">
@@ -345,11 +350,18 @@
                 <v-col cols="4">
                   <v-card outlined class="pa-2">
                     <h4 class="mb-2">요청사항</h4>
-                    <v-row dense>
+                    <v-row dense v-if="item.supplies.flat().filter(supply => supply.quantity > 0).length > 0">
                       <v-col cols="6" v-for="supply in item.supplies.flat().filter(supply => supply.quantity > 0)"
                         :key="supply.name">
                         <div class="supply-item">
                           {{ supply.name }} x {{ supply.quantity }}
+                        </div>
+                      </v-col>
+                    </v-row>
+                    <v-row dense v-else>
+                      <v-col cols="6">
+                        <div class="supply-item">
+                          요청사항 없음
                         </div>
                       </v-col>
                     </v-row>
@@ -968,6 +980,11 @@ export default {
           return false;
         }
 
+        if (pickup_date < order_date) {
+          this.showSnackbar('픽업 날짜는 주문 날짜 이후여야 합니다.', 'error');
+          return false;
+        }
+
         const formatDate = (date) => {
           const year = date.getFullYear();
           const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -997,23 +1014,9 @@ export default {
         this.resetNewReservation();
         await this.fetchReservations();
         await this.fetchAvailableCakes();
-
-        this.newReservation = {
-          customer_name: '',
-          customer_phone: '',
-          pickup_date: null,
-          pickup_hour: '',
-          pickup_minute: '',
-          cakes: [],
-          supplies: [],
-          request: '',
-          order_date: null,
-          phoneNumber: {
-            part1: "010",
-            part2: "",
-            part3: "",
-          },
-        };
+        if (this.dialog) {
+          this.dialog = false;
+        }
       } catch (error) {
         console.error('Error adding reservation:', error);
         const responseError = error.response?.data?.error;
@@ -1113,6 +1116,9 @@ export default {
       this.addDialog = true;
       this.loading = true;
       this.editDialogContext = 'add';
+      if (this.selectedDate) {
+        this.newReservation.pickup_date = new Date(this.selectedDate);
+      }
       this.loading = false;
     },
 
@@ -1198,6 +1204,12 @@ export default {
     timeToMinutes(time) {
       const [hours, minutes] = time.split(':').map(Number);
       return hours * 60 + minutes;
+    },
+
+    handleDialogClose(value) {
+      if (!value) {
+        this.selectedDate = '';
+      }
     },
   },
 };

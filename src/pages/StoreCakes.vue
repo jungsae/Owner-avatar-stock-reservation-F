@@ -23,7 +23,7 @@
       <div class="search-field">
         <input v-model="searchQuery" placeholder="검색" class="search-input">
       </div>
-      <v-btn color="#9e9e9e" class="add-button" height="46" rounded @click="openAddDialog">
+      <v-btn class="add-button" height="46" rounded @click="openAddDialog">
         재고 등록
       </v-btn>
     </div>
@@ -35,14 +35,12 @@
       </h2>
       <v-row dense>
         <v-col v-for="cake in cakes" :key="cake.id" cols="6" sm="4" md="3" lg="2" class="cake-column">
-          <v-card outlined class="cake-card rounded-card">
+          <v-card outlined class="cake-card" @click="showCakeByReservation(cake)">
             <v-card-text>
-              <h4>{{ cake.cakeInfo.name }}</h4>
-              <div><strong>재고:</strong> {{ cake.stock }}</div>
+              <h5>{{ cake.cakeInfo.name }}</h5>
+              <h5><strong>재고:</strong> {{ cake.stock }}</h5>
             </v-card-text>
-            <div>{{ console.log("cake.cakeInfo.image_url", cake.cakeInfo) }}</div>
-            <v-img :src="getImageUrl(cake.cakeInfo.image_url)" max-height="120" max-width="100%" class="cake-image" />
-            <h5><strong>{{ cake.cakeInfo.description }}</strong></h5>
+            <v-img :src="getImageUrl(cake.cakeInfo.image_url)" max-height="105" max-width="100%" class="cake-image" />
             <v-card-actions class="d-flex justify-space-between align-center action-buttons">
               <v-btn size="large" color="#7d95e3" @click="openEditStockDialog(cake)">
                 재고 수정
@@ -64,12 +62,12 @@
         </div>
         <v-card-text>
           <v-row dense>
-            <v-col v-for="cake in availableCakes" :key="cake.id" cols="3" md="3" lg="3" xl="2">
-              <v-card outlined max-height="95" max-width="180" variant="plain"
+            <v-col v-for="cake in availableCakes" :key="cake.id" cols="3" md="2" lg="2" xl="2">
+              <v-card outlined max-height="95" max-width="120" variant="plain"
                 class="d-flex flex-column align-center pa-1" :class="{ 'selected-cake': selectedCake === cake.id }"
                 @click="selectCake(cake)">
-                <img :src="getImageUrl(cake.image_url)" height="60" width="70" class="mb-1">
-                <div style="font-size: 62%; text-align: center; font-weight: bold;">
+                <img :src="getImageUrl(cake.image_url)" height="60" width="70">
+                <div style="font-size: 60%; text-align: center; font-weight: bold;">
                   {{ cake.name }}
                 </div>
               </v-card>
@@ -126,6 +124,26 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- 예약 현황 모달 -->
+    <v-dialog v-model="reservationDialog" max-width="800px">
+      <v-card>
+        <v-card-title class="text-center">
+          {{ selectedCakeForReservation?.cakeInfo.name }} 예약 현황
+        </v-card-title>
+        <v-card-text>
+          <div class="text-center">
+            <p>현재 예약 수량: {{ reservationCount }}개</p>
+            <p>현재 재고 수량: {{ selectedCakeForReservation?.stock }}개</p>
+          </div>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-btn color="primary" @click="reservationDialog = false">
+            확인
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -153,6 +171,10 @@ const searchQuery = ref(""); // 검색어
 const snackbar = ref(false);
 const snackbarMessage = ref('');
 const snackbarColor = ref('');
+
+const reservationDialog = ref(false);
+const selectedCakeForReservation = ref(null);
+const reservationCount = ref(0);
 
 const showSnackbar = (message, type = 'info') => {
   snackbarMessage.value = message;
@@ -280,17 +302,11 @@ const addCake = async () => {
       showSnackbar('등록할 케이크를 선택하세요!', 'error');
       return;
     }
-
-    console.log('선택된 케이크 정보:', selectedCake.value);
-    console.log('선택된 케이크의 이미지 URL:', availableCakes.value.find(cake => cake.id === selectedCake.value)?.image_url);
-
     // 서버에 재고 추가 요청
-    const response = await api.post('/storeCakes', {
+    await api.post('/storeCakes', {
       cake_id: selectedCake.value,
       stock: newStock.value,
     });
-
-    console.log('서버 응답:', response.data);
 
     showSnackbar('재고가 성공적으로 등록되었습니다!', 'success');
     await fetchStoreCakes();
@@ -331,6 +347,17 @@ const removeCake = async () => {
     fetchAvailableCakes();
   } catch (error) {
     showSnackbar('케이크 삭제에 실패했습니다', error.data.message);
+  }
+};
+
+const showCakeByReservation = async (cake) => {
+  try {
+    selectedCakeForReservation.value = cake;
+    const response = await api.get(`/reservations/count/${cake.id}`);
+    reservationCount.value = response.data.count;
+    reservationDialog.value = true;
+  } catch (error) {
+    showSnackbar('예약 정보를 불러오는데 실패했습니다', 'error');
   }
 };
 
@@ -388,8 +415,9 @@ onMounted(async () => {
 }
 
 .selected-cake {
-  border: 2px solid #231616;
-  box-shadow: 0 0 10px rgba(0, 1, 2, 0.5);
+  font-size: 95%;
+  border: 3px solid #0b0707;
+  box-shadow: 0 0 10px rgba(6, 10, 12, 0.5);
 }
 
 .custom-spinner input[type="number"]::-webkit-inner-spin-button {
@@ -426,7 +454,7 @@ onMounted(async () => {
 }
 
 .add-button {
-  background-color: #9e9e9e !important;
+  background-color: #2471e4 !important;
   color: white !important;
   font-size: 14px;
   font-weight: bold;
@@ -436,7 +464,7 @@ onMounted(async () => {
 }
 
 .add-button:hover {
-  background-color: #757575 !important;
+  background-color: #2471e4ba !important;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -459,19 +487,19 @@ onMounted(async () => {
 }
 
 .cake-column {
-  margin-bottom: 20px;
+  margin-bottom: 5px;
 }
 
 .cake-card {
   text-align: center;
   max-width: 300px;
-  min-height: 280px;
+  min-height: auto;
   margin: auto;
   transition: transform 0.3s, box-shadow 0.3s;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
+  box-shadow: 0 5px 6px rgba(0, 0, 0, 0.15);
+  border-radius: 20px;
   background-color: #ffffff;
-  border: 1px solid #eee;
+  border: 4px solid #27242440;
 }
 
 .cake-card:hover {
@@ -480,11 +508,7 @@ onMounted(async () => {
 }
 
 .cake-image {
-  margin-bottom: 6px;
-}
-
-.action-buttons {
-  flex-wrap: wrap;
+  margin-bottom: 2px;
 }
 
 .v-btn {
