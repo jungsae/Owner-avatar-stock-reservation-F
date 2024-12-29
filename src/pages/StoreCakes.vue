@@ -35,17 +35,19 @@
       </h2>
       <v-row dense>
         <v-col v-for="cake in cakes" :key="cake.id" cols="6" sm="4" md="3" lg="2" class="cake-column">
-          <v-card outlined class="cake-card" @click="showCakeByReservation(cake)">
-            <v-card-text>
-              <h5>{{ cake.cakeInfo.name }}</h5>
-              <h5><strong>재고:</strong> {{ cake.stock }}</h5>
-            </v-card-text>
-            <v-img :src="getImageUrl(cake.cakeInfo.image_url)" max-height="105" max-width="100%" class="cake-image" />
-            <v-card-actions class="d-flex justify-space-between align-center action-buttons">
-              <v-btn size="large" color="#7d95e3" @click="openEditStockDialog(cake)">
+          <v-card outlined class="cake-card">
+            <div class="card-content" @click="showCakeByReservation(cake)">
+              <v-card-text>
+                <h5>{{ cake.cakeInfo.name }}</h5>
+                <h5><strong>재고:</strong> {{ cake.stock }}</h5>
+              </v-card-text>
+              <v-img :src="getImageUrl(cake.cakeInfo.image_url)" max-height="105" max-width="100%" class="cake-image" />
+            </div>
+            <v-card-actions class="action-buttons">
+              <v-btn size="large" color="#7d95e3" @click.stop="openEditStockDialog(cake)">
                 재고 수정
               </v-btn>
-              <v-btn size="large" color="error" @click="confirmRemoveCake(cake)">
+              <v-btn size="large" color="error" @click.stop="confirmRemoveCake(cake)">
                 판매 중지
               </v-btn>
             </v-card-actions>
@@ -353,11 +355,11 @@ const removeCake = async () => {
 const showCakeByReservation = async (cake) => {
   try {
     selectedCakeForReservation.value = cake;
-    const response = await api.get(`/reservations/count/${cake.id}`);
+    const response = await api.get(`/reservations/count/${cake.cake_id}`);
     reservationCount.value = response.data.count;
     reservationDialog.value = true;
   } catch (error) {
-    showSnackbar('예약 정보를 불러오는데 실패했습니다', 'error');
+    showSnackbar('예약 정보를 불러오는데 실패했습니다', error.data.message);
   }
 };
 
@@ -540,5 +542,53 @@ onMounted(async () => {
   .v-btn {
     text-align: center;
   }
+}
+
+.card-content {
+  cursor: pointer;
+  position: relative;
+  padding-bottom: 0;
+}
+
+.card-content::after {
+  content: "클릭하여 예약현황 보기";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(56, 65, 69, 0.775);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.card-content:hover::after {
+  opacity: 1;
+}
+
+.cake-card {
+  text-align: center;
+  max-width: 300px;
+  min-height: auto;
+  margin: auto;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 5px 6px rgba(0, 0, 0, 0.15);
+  border-radius: 20px;
+  background-color: #ffffff;
+  border: 4px solid #27242440;
+}
+
+.cake-card .card-content:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.action-buttons {
+  padding-top: 0;
+  margin-top: 8px;
 }
 </style>
