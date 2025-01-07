@@ -290,7 +290,14 @@
           style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
           <div>
             <p>예약 내역 ({{ selectedDate }})</p>
-            <v-btn style="width: 100%;" color="green" @click="openAddReservationDialog">
+           <div>{{ console.log('1',new Date( selectedDate)) }}</div>
+           <div>{{ console.log('2',today) }}</div>
+           <div>{{ console.log('3',selectedDate < today) }}</div>
+            <v-btn
+              style="width: 100%;" 
+              color="green" 
+              @click="openAddReservationDialog"
+            >
               예약추가
             </v-btn>
           </div>
@@ -521,7 +528,7 @@ export default {
         customer_phone: '',
         phoneNumber: {
           part1: "010",
-          part2: "",
+          part2: "****",
           part3: "",
         },
         order_date: null,
@@ -982,6 +989,11 @@ export default {
 
         if (pickup_date < order_date) {
           this.showSnackbar('픽업 날짜는 주문 날짜 이후여야 합니다.', 'error');
+          return false;
+        }
+
+        if (order_date < new Date().toISOString().split('T')[0]) {
+          this.showSnackbar('주문 날짜는 오늘 이후여야 합니다.', 'error');
           return false;
         }
 

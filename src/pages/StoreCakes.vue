@@ -41,7 +41,7 @@
                 <h5>{{ cake.cakeInfo.name }}</h5>
                 <h5><strong>재고:</strong> {{ cake.stock }}</h5>
               </v-card-text>
-              <v-img :src="getImageUrl(cake.cakeInfo.image_url)" max-height="105" max-width="100%" class="cake-image" />
+              <v-img :src="getImageUrl(cake.cakeInfo.image_url)" max-height="90" max-width="100%" class="cake-image" />
             </div>
             <v-card-actions class="action-buttons">
               <v-btn size="large" color="#7d95e3" @click.stop="openEditStockDialog(cake)">
@@ -128,19 +128,38 @@
     </v-dialog>
 
     <!-- 예약 현황 모달 -->
-    <v-dialog v-model="reservationDialog" max-width="800px">
+    <v-dialog v-model="reservationDialog" max-width="500px" height="500px">
       <v-card>
         <v-card-title class="text-center">
-          {{ selectedCakeForReservation?.cakeInfo.name }} 예약 현황
+          {{ selectedCakeForReservation.cakeInfo.name }} 예약 현황
         </v-card-title>
         <v-card-text>
-          <div class="text-center">
-            <p>현재 예약 수량: {{ reservationCount }}개</p>
-            <p>현재 재고 수량: {{ selectedCakeForReservation?.stock }}개</p>
+          <div v-if="Array.isArray(reservationInfo) && reservationInfo.length > 0">
+            <v-table>
+              <thead>
+                <tr>
+                  <th>예약자</th>
+                  <th>수량</th>
+                  <th>픽업날짜</th>
+                  <th>픽업시간</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="reservation in reservationInfo" :key="reservation.id">
+                  <td>{{ maskName(reservation.customer_name) }}</td>
+                  <td>{{ reservation.ReservationCake.quantity }}개</td>
+                  <td>{{ formatDate(reservation.pickup_date) }}</td>
+                  <td>{{ reservation.pickup_time }}</td>
+                </tr>
+              </tbody>
+            </v-table>
+          </div>
+          <div v-else class="text-center mt-5">
+            <p><strong>예약 없음</strong></p>
           </div>
         </v-card-text>
         <v-card-actions class="justify-center">
-          <v-btn color="primary" @click="reservationDialog = false">
+          <v-btn width="100%" height="50" color="primary" @click="reservationDialog = false">
             확인
           </v-btn>
         </v-card-actions>
@@ -176,7 +195,7 @@ const snackbarColor = ref('');
 
 const reservationDialog = ref(false);
 const selectedCakeForReservation = ref(null);
-const reservationCount = ref(0);
+const reservationInfo = ref({});
 
 const showSnackbar = (message, type = 'info') => {
   snackbarMessage.value = message;
@@ -354,13 +373,29 @@ const removeCake = async () => {
 
 const showCakeByReservation = async (cake) => {
   try {
+    isLoading.value = true;
     selectedCakeForReservation.value = cake;
-    const response = await api.get(`/reservations/count/${cake.cake_id}`);
-    reservationCount.value = response.data.count;
+    const response = await api.get(`/reservations/count/${cake.cake_id}`) ;
+    const checkCake = response.data.cake.length > 0 ? response.data.cake : {};
+    reservationInfo.value = checkCake;
+    isLoading.value = false;
     reservationDialog.value = true;
   } catch (error) {
     showSnackbar('예약 정보를 불러오는데 실패했습니다', error.data.message);
   }
+};
+
+const maskName = (name) => {
+  if (!name) return '';
+  if (name.length <= 2) return name[0] + '*';
+  return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1];
+};
+
+const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString('ko-KR', {
+    month: 'long',
+    day: 'numeric'
+  });
 };
 
 onMounted(async () => {
