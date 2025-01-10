@@ -77,7 +77,9 @@
           </v-row>
           <div style="margin-top: 20px;">
             <v-text-field v-model="newStock" label="재고수량" type="tel" inputmode="numeric" pattern="[0-9]*" outlined dense
-              required style="max-width: 300px; margin: 20px auto;" class="custom-spinner" @keypress="event => {
+              required style="max-width: 300px; margin: 20px auto;" class="custom-spinner"
+              :rules="[v => /^\d+$/.test(v) || '숫자만 입력 가능합니다', v => Number(v) <= 1000 || '최대 1000까지 입력 가능합니다']"
+              @input="validateNumberOnly" @keypress="event => {
                 if (!/[0-9]/.test(event.key)) {
                   event.preventDefault();
                 }
@@ -99,14 +101,15 @@
     <v-dialog v-model="editStockDialog" max-width="300px">
       <v-card class="d-flex justify-space-between align-center">
         <v-card-title>재고 수정</v-card-title>
-        <v-card-text>
-          <v-text-field v-model="updatedStock" label="재고" type="tel" inputmode="numeric" pattern="[0-9]*" outlined dense
-            required @keypress="event => {
-              if (!/[0-9]/.test(event.key)) {
-                event.preventDefault();
-              }
-            }" />
-        </v-card-text>
+        <v-text-field v-model="updatedStock" label="재고" type="tel" inputmode="numeric" pattern="[0-9]*" :max="1000"
+          outlined dense required style="width: 80%" :rules="[
+            v => /^\d+$/.test(v) || '숫자만 입력 가능합니다',
+            v => Number(v) <= 1000 || '최대 1000까지 입력 가능합니다'
+          ]" @input="validateNumberOnly" @keypress="event => {
+            if (!/[0-9]/.test(event.key)) {
+              event.preventDefault();
+            }
+          }" />
         <v-card-actions>
           <v-btn color="primary" @click="updateStock">
             저장
@@ -296,13 +299,13 @@ const openAddDialog = () => {
   }
 
   selectedCake.value = null;
-  newStock.value = 0;
+  newStock.value = '';
   addDialog.value = true;
 };
 const closeAddDialog = () => {
   addDialog.value = false;
   selectedCake.value = null;
-  newStock.value = 0;
+  newStock.value = '';
 };
 
 const openEditStockDialog = (cake) => {
@@ -311,9 +314,9 @@ const openEditStockDialog = (cake) => {
   editStockDialog.value = true;
 };
 const closeEditStockDialog = () => {
+  updatedStock.value = 0;
   editStockDialog.value = false;
   selectedCakeForEdit.value = null;
-  updatedStock.value = 0;
 };
 
 const confirmRemoveCake = (cake) => {
@@ -327,6 +330,21 @@ const closeRemoveDialog = () => {
 
 // 케이크 추가
 const addCake = async () => {
+  if (Number(newStock.value) < 0) {
+    showSnackbar('올바른 수량을 입력해주세요!')
+    return
+  }
+
+  if (isNaN(newStock.value)) {
+    showSnackbar('숫자만 입력 가능합니다!')
+    return
+  }
+
+  if (Number(newStock.value) > 1000) {
+    showSnackbar('최대 1000까지 입력 가능합니다!')
+    return
+  }
+
   try {
     if (!selectedCake.value) {
       showSnackbar('등록할 케이크를 선택하세요!', 'error');
@@ -350,8 +368,18 @@ const addCake = async () => {
 
 // 재고 수정
 const updateStock = async () => {
-  if (updatedStock.value < 0) {
+  if (Number(updatedStock.value) < 0) {
     showSnackbar('올바른 수량을 입력해주세요!')
+    return
+  }
+
+  if (isNaN(updatedStock.value)) {
+    showSnackbar('숫자만 입력 가능합니다!')
+    return
+  }
+
+  if (Number(updatedStock.value) > 1000) {
+    showSnackbar('최대 1000까지 입력 가능합니다!')
     return
   }
 
@@ -405,6 +433,10 @@ const formatDate = (dateString) => {
     month: 'long',
     day: 'numeric'
   });
+};
+
+const validateNumberOnly = (event) => {
+  event.target.value = event.target.value.replace(/[^\d]/g, '');
 };
 
 onMounted(async () => {
