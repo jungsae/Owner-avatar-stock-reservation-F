@@ -384,13 +384,15 @@ const updateStock = async () => {
   }
 
   try {
+    isLoading.value = true;
     await api.put(`/storeCakes/${selectedCakeForEdit.value.id}`, {
       stock: updatedStock.value,
     });
 
-    closeEditStockDialog();
     fetchStoreCakes();
+    closeEditStockDialog();
     showSnackbar('재고가 수정되었습니다!', 'success');
+    isLoading.value = false;
   } catch (error) {
     showSnackbar(`재고 수정 중 오류가 발생했습니다 ${error.response.data.message}`, 'error');
   }
@@ -399,10 +401,12 @@ const updateStock = async () => {
 // 케이크 삭제
 const removeCake = async () => {
   try {
+    isLoading.value = true;
     await api.delete(`/storeCakes/${selectedCakeForRemove.value.id}`);
     closeRemoveDialog();
     fetchStoreCakes();
     fetchAvailableCakes();
+    isLoading.value = false;
   } catch (error) {
     showSnackbar('케이크 삭제에 실패했습니다', error.data.message);
   }
