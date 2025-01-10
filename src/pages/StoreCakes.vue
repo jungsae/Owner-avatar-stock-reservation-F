@@ -76,8 +76,12 @@
             </v-col>
           </v-row>
           <div style="margin-top: 20px;">
-            <v-text-field v-model="newStock" label="재고수량" type="number" outlined dense required
-              style="max-width: 300px; margin: 20px auto;" class="custom-spinner" />
+            <v-text-field v-model="newStock" label="재고수량" type="tel" inputmode="numeric" pattern="[0-9]*" outlined dense
+              required style="max-width: 300px; margin: 20px auto;" class="custom-spinner" @keypress="event => {
+                if (!/[0-9]/.test(event.key)) {
+                  event.preventDefault();
+                }
+              }" />
           </div>
         </v-card-text>
         <v-card-actions>
@@ -96,7 +100,12 @@
       <v-card class="d-flex justify-space-between align-center">
         <v-card-title>재고 수정</v-card-title>
         <v-card-text>
-          <v-text-field v-model="updatedStock" label="재고" type="number" outlined dense required />
+          <v-text-field v-model="updatedStock" label="재고" type="tel" inputmode="numeric" pattern="[0-9]*" outlined dense
+            required @keypress="event => {
+              if (!/[0-9]/.test(event.key)) {
+                event.preventDefault();
+              }
+            }" />
         </v-card-text>
         <v-card-actions>
           <v-btn color="primary" @click="updateStock">
@@ -135,21 +144,21 @@
         </v-card-title>
         <v-card-text>
           <div v-if="Array.isArray(reservationInfo) && reservationInfo.length > 0">
-            <v-table>
+            <v-table density="compact" class="reservation-table">
               <thead>
                 <tr>
-                  <th>예약자</th>
-                  <th>수량</th>
-                  <th>픽업날짜</th>
-                  <th>픽업시간</th>
+                  <th class="text-caption text-center">예약자</th>
+                  <th class="text-caption text-center">수량</th>
+                  <th class="text-caption text-center">픽업날짜</th>
+                  <th class="text-caption text-center">픽업시간</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="reservation in reservationInfo" :key="reservation.id">
-                  <td>{{ maskName(reservation.customer_name) }}</td>
-                  <td>{{ reservation.ReservationCake.quantity }}개</td>
-                  <td>{{ formatDate(reservation.pickup_date) }}</td>
-                  <td>{{ reservation.pickup_time }}</td>
+                  <td class="text-caption text-center">{{ maskName(reservation.customer_name) }}</td>
+                  <td class="text-caption text-center">{{ reservation.ReservationCake.quantity }}개</td>
+                  <td class="text-caption text-center">{{ formatDate(reservation.pickup_date) }}</td>
+                  <td class="text-caption text-center">{{ reservation.pickup_time }}</td>
                 </tr>
               </tbody>
             </v-table>
@@ -375,7 +384,7 @@ const showCakeByReservation = async (cake) => {
   try {
     isLoading.value = true;
     selectedCakeForReservation.value = cake;
-    const response = await api.get(`/reservations/count/${cake.cake_id}`) ;
+    const response = await api.get(`/reservations/count/${cake.cake_id}`);
     const checkCake = response.data.cake.length > 0 ? response.data.cake : {};
     reservationInfo.value = checkCake;
     isLoading.value = false;
@@ -625,5 +634,11 @@ onMounted(async () => {
 .action-buttons {
   padding-top: 0;
   margin-top: 8px;
+}
+
+.reservation-table :deep(td),
+.reservation-table :deep(th) {
+  padding: 4px !important;
+  height: auto !important;
 }
 </style>
