@@ -1,17 +1,6 @@
 <template>
   <v-container>
-    <v-card class="mx-auto mt-5 pa-4 shadow-box" max-width="600px" outlined>
-      <v-card-title class="d-flex align-center justify-center pa-4" style="background-color: #F5F5F5;">
-        <v-icon large color="grey" class="mr-2">
-          mdi-store
-        </v-icon>
-        <h2 style="text-align: center; color: #424242;">
-          마이페이지
-        </h2>
-      </v-card-title>
-
-      <v-divider />
-
+    <v-card class="mx-auto mb-8 pa-4 shadow-box" max-width="100%" outlined>
       <v-card-text>
         <v-row dense>
           <v-col cols="12">
@@ -19,22 +8,19 @@
               <v-icon small color="grey" class="mr-2">
                 mdi-storefront
               </v-icon>
-              <strong>매장명:</strong>
-              <span>{{ storeInfo.name }}</span>
+              <strong>매장명: {{ storeInfo.name }}</strong>
             </p>
             <p class="info-item">
               <v-icon small color="grey" class="mr-2">
                 mdi-account
               </v-icon>
-              <strong>아이디:</strong>
-              <span>{{ storeInfo.username }}</span>
+              <strong>아이디: {{ storeInfo.username }}</strong>
             </p>
             <p class="info-item">
               <v-icon small color="grey" class="mr-2">
                 mdi-calendar
               </v-icon>
-              <strong>가입일:</strong>
-              <span>{{ formatDate(storeInfo.createdAt) }}</span>
+              <strong>가입일: {{ storeInfo.createdAt }}</strong>
             </p>
           </v-col>
         </v-row>
@@ -52,6 +38,97 @@
       </v-card-text>
     </v-card>
 
+    <h2 class="text-h5 mb-4 font-weight-bold" style="color: #424242;">
+      <v-icon large color="primary" class="mr-2">mdi-view-dashboard</v-icon>
+      매장 현황
+    </h2>
+
+    <v-row>
+      <v-col cols="12">
+        <v-card class="dashboard-section mb-4">
+          <v-card-text>
+            <div class="d-flex align-center mb-4">
+              <div class="dashboard-icon primary">
+                <v-icon large color="white">mdi-cake-variant</v-icon>
+              </div>
+              <div class="dashboard-content">
+                <h3 class="text-h6 mb-1">총 케이크 종류</h3>
+                <p class="text-h4 mb-0">{{ dashboardData.totalCakeTypes }}</p>
+              </div>
+            </div>
+
+            <v-divider class="mb-3" />
+
+            <v-list>
+              <v-list-item v-for="cake in storeCakes" :key="cake.id" class="cake-list-item">
+                <div class="d-flex justify-space-between align-center">
+                  <span class="cake-name">{{ cake.cakeInfo.name }}</span>
+                  <span class="stock-value">{{ cake.stock }}개</span>
+                </div>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <v-col cols="12">
+        <v-card class="dashboard-section mb-4">
+          <v-card-text>
+            <div class="d-flex align-center mb-4">
+              <div class="dashboard-icon success">
+                <v-icon large color="white">mdi-package-variant</v-icon>
+              </div>
+              <div class="dashboard-content">
+                <h3 class="text-h6 mb-1">현재 총 재고</h3>
+                <p class="text-h4 mb-0">{{ dashboardData.totalStock }}</p>
+              </div>
+            </div>
+
+            <v-divider class="mb-3" />
+
+            <v-list>
+              <v-list-item v-for="cake in sortedByStock" :key="cake.id" class="cake-list-item">
+                <div class="d-flex justify-space-between align-center">
+                  <span class="cake-name">{{ cake.cakeInfo.name }}</span>
+                  <span class="stock-value">{{ cake.stock }}개</span>
+                </div>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <v-col cols="12">
+        <v-card class="dashboard-section">
+          <v-card-text>
+            <div class="d-flex align-center mb-4">
+              <div class="dashboard-icon error">
+                <v-icon large color="white">mdi-alert-circle-outline</v-icon>
+              </div>
+              <div class="dashboard-content">
+                <h3 class="text-h6 mb-1">부족 재고</h3>
+                <p class="text-h4 mb-0">{{ dashboardData.lowStock }}</p>
+              </div>
+            </div>
+
+            <v-divider class="mb-3" />
+
+            <v-list v-if="lowStockCakes.length > 0">
+              <v-list-item v-for="cake in lowStockCakes" :key="cake.id" class="cake-list-item">
+                <div class="d-flex justify-space-between align-center">
+                  <span class="cake-name">{{ cake.cakeInfo.name }}</span>
+                  <span class="stock-value error--text">{{ cake.stock }}개</span>
+                </div>
+              </v-list-item>
+            </v-list>
+            <div v-else class="text-center pa-4 grey--text">
+              부족 재고 항목이 없습니다
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+
     <v-dialog v-model="deleteDialog" max-width="400px">
       <v-card>
         <v-card-title>
@@ -62,7 +139,7 @@
         <v-card-text>
           <div style="text-align: center;">
             <p>정말로 회원 탈퇴를 진행하시겠습니까?</p>
-            <p>탈퇴 이후에는 복구는 문의바랍니다.</p>
+            <p>탈퇴 이후 복구는 문의바랍니다.</p>
           </div>
         </v-card-text>
         <v-card-actions class="d-flex justify-center">
@@ -85,7 +162,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import api from '@/plugins/axios';
 import { useAuthStore } from '@/stores/auth';
 import router from '@/router';
@@ -96,11 +173,26 @@ const deleteDialog = ref(false);
 const isLoading = ref(false);
 const authStore = useAuthStore();
 
-// 유틸리티 함수
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-};
+// 대시보드 데이터 상태 수정
+const dashboardData = ref({
+  totalCakeTypes: 0,
+  totalStock: 0,
+  lowStock: 0
+});
+
+const storeCakes = ref([]);
+
+// 재고 많은 순으로 정렬된 케이크 목록
+const sortedByStock = computed(() => {
+  return [...storeCakes.value].sort((a, b) => b.stock - a.stock);
+});
+
+// 부족 재고 케이크 목록 (10개 미만)
+const lowStockCakes = computed(() => {
+  return storeCakes.value
+    .filter(cake => cake.stock < 3)
+    .sort((a, b) => a.stock - b.stock);
+});
 
 // 매장 정보 가져오기
 const fetchStoreInfo = async () => {
@@ -108,10 +200,27 @@ const fetchStoreInfo = async () => {
     isLoading.value = true;
     const response = await api.get('/stores');
     storeInfo.value = response.data;
+    storeInfo.value.createdAt = storeInfo.value.createdAt.split('T')[0];
   } catch (error) {
     console.error('매장 정보를 가져오는 중 오류 발생:', error);
   } finally {
     isLoading.value = false;
+  }
+};
+
+// 대시보드 데이터 가져오기
+const fetchDashboardData = async () => {
+  try {
+    const response = await api.get('/storeCakes');
+    storeCakes.value = response.data;
+
+    dashboardData.value = {
+      totalCakeTypes: storeCakes.value.length,
+      totalStock: storeCakes.value.reduce((sum, cake) => sum + cake.stock, 0),
+      lowStock: storeCakes.value.filter(cake => cake.stock < 10).length
+    };
+  } catch (error) {
+    console.error('대시보드 데이터를 가져오는 중 오류 발생:', error);
   }
 };
 
@@ -136,7 +245,10 @@ const deleteAccount = async () => {
   }
 };
 
-onMounted(fetchStoreInfo);
+// onMounted 수정
+onMounted(async () => {
+  await Promise.all([fetchStoreInfo(), fetchDashboardData()]);
+});
 </script>
 
 <style scoped>
@@ -186,6 +298,115 @@ onMounted(fetchStoreInfo);
 
   .pa-4 {
     padding: 1rem;
+  }
+}
+
+.dashboard-card {
+  transition: transform 0.2s;
+  border-radius: 12px;
+}
+
+.dashboard-card:hover {
+  transform: translateX(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+}
+
+.dashboard-icon.primary {
+  background-color: var(--v-primary-base);
+}
+
+.dashboard-icon.success {
+  background-color: var(--v-success-base);
+}
+
+.dashboard-icon.error {
+  background-color: var(--v-error-base);
+}
+
+.dashboard-content {
+  flex-grow: 1;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .dashboard-card {
+    margin-bottom: 1rem;
+  }
+
+  .dashboard-icon {
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+  }
+}
+
+.dashboard-section {
+  border-radius: 12px;
+}
+
+.cake-list-item {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 8px 16px;
+}
+
+.cake-list-item:last-child {
+  border-bottom: none;
+}
+
+.cake-name {
+  font-weight: 500;
+}
+
+.stock-value {
+  font-weight: bold;
+}
+
+.mb-3 {
+  margin-bottom: 12px;
+}
+
+.mb-4 {
+  margin-bottom: 24px;
+}
+
+@media (max-width: 600px) {
+  .cake-list-item {
+    padding: 4px 8px;
+  }
+
+  .dashboard-icon {
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .info-item {
+    font-size: 1rem;
+    line-height: 2;
+    padding: 0.3rem 0;
+  }
+
+  .info-item strong {
+    margin-right: 0.5rem;
+  }
+
+  .info-item .v-icon {
+    margin-right: 0.5rem !important;
   }
 }
 </style>

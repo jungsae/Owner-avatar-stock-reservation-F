@@ -300,19 +300,16 @@
           style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
           <div>
             <p>예약 내역 ({{ selectedDate }})</p>
-            <div>{{ console.log('1', new Date(selectedDate)) }}</div>
-            <div>{{ console.log('2', today) }}</div>
-            <div>{{ console.log('3', selectedDate < today) }}</div>
-                <v-btn style="width: 100%;" color="green" @click="openAddReservationDialog">
-                  예약추가
-                </v-btn>
-            </div>
-            <div class="controls" style="display: flex; align-items: center; gap: 8px;">
-              <v-checkbox v-model="hideCancelled" label="예약 취소 숨기기" @change="filterReservations" dense hide-details />
-              <v-btn icon @click="toggleSortOrder">
-                <v-icon>{{ sortOrder === 'asc' ? 'mdi-arrow-up' : 'mdi-arrow-down' }}</v-icon>
-              </v-btn>
-            </div>
+            <v-btn style="width: 100%;" color="green" @click="openAddReservationDialog">
+              예약추가
+            </v-btn>
+          </div>
+          <div class="controls" style="display: flex; align-items: center; gap: 8px;">
+            <v-checkbox v-model="hideCancelled" label="예약 취소 숨기기" @change="filterReservations" dense hide-details />
+            <v-btn icon @click="toggleSortOrder">
+              <v-icon>{{ sortOrder === 'asc' ? 'mdi-arrow-up' : 'mdi-arrow-down' }}</v-icon>
+            </v-btn>
+          </div>
         </v-card-title>
 
         <v-divider></v-divider>
