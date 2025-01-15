@@ -53,19 +53,41 @@
               </div>
               <div class="dashboard-content">
                 <h3 class="text-h6 mb-1">총 케이크 종류</h3>
-                <p class="text-h4 mb-0">{{ dashboardData.totalCakeTypes }}</p>
               </div>
             </div>
 
             <v-divider class="mb-3" />
 
             <v-list>
-              <v-list-item v-for="cake in storeCakes" :key="cake.id" class="cake-list-item">
-                <div class="d-flex justify-space-between align-center">
-                  <span class="cake-name">{{ cake.cakeInfo.name }}</span>
-                  <span class="stock-value">{{ cake.stock }}개</span>
-                </div>
-              </v-list-item>
+              <template v-if="groupedCakes.whole.length > 0">
+                <div class="cake-group-header">홀케이크</div>
+                <v-list-item v-for="cake in groupedCakes.whole" :key="cake.id" class="cake-list-item">
+                  <div class="d-flex justify-space-between align-center">
+                    <span class="cake-name">{{ cake.cakeInfo.name }}</span>
+                    <span class="stock-value">{{ cake.stock }}개</span>
+                  </div>
+                </v-list-item>
+              </template>
+
+              <template v-if="groupedCakes.piece.length > 0">
+                <div class="cake-group-header">피스케이크</div>
+                <v-list-item v-for="cake in groupedCakes.piece" :key="cake.id" class="cake-list-item">
+                  <div class="d-flex justify-space-between align-center">
+                    <span class="cake-name">{{ cake.cakeInfo.name.substring(2) }}</span>
+                    <span class="stock-value">{{ cake.stock }}개</span>
+                  </div>
+                </v-list-item>
+              </template>
+
+              <template v-if="groupedCakes.spoon.length > 0">
+                <div class="cake-group-header">떠먹는케이크</div>
+                <v-list-item v-for="cake in groupedCakes.spoon" :key="cake.id" class="cake-list-item">
+                  <div class="d-flex justify-space-between align-center">
+                    <span class="cake-name">{{ cake.cakeInfo.name }}</span>
+                    <span class="stock-value">{{ cake.stock }}개</span>
+                  </div>
+                </v-list-item>
+              </template>
             </v-list>
           </v-card-text>
         </v-card>
@@ -79,20 +101,42 @@
                 <v-icon large color="white">mdi-package-variant</v-icon>
               </div>
               <div class="dashboard-content">
-                <h3 class="text-h6 mb-1">현재 총 재고</h3>
-                <p class="text-h4 mb-0">{{ dashboardData.totalStock }}</p>
+                <h3 class="text-h6 mb-1">총 재고</h3>
               </div>
             </div>
 
             <v-divider class="mb-3" />
 
             <v-list>
-              <v-list-item v-for="cake in sortedByStock" :key="cake.id" class="cake-list-item">
-                <div class="d-flex justify-space-between align-center">
-                  <span class="cake-name">{{ cake.cakeInfo.name }}</span>
-                  <span class="stock-value">{{ cake.stock }}개</span>
-                </div>
-              </v-list-item>
+              <template v-if="groupedSortedByStock.whole.length > 0">
+                <div class="cake-group-header">홀케이크</div>
+                <v-list-item v-for="cake in groupedSortedByStock.whole" :key="cake.id" class="cake-list-item">
+                  <div class="d-flex justify-space-between align-center">
+                    <span class="cake-name">{{ cake.cakeInfo.name }}</span>
+                    <span class="stock-value">{{ cake.stock }}개</span>
+                  </div>
+                </v-list-item>
+              </template>
+
+              <template v-if="groupedSortedByStock.piece.length > 0">
+                <div class="cake-group-header">피스케이크</div>
+                <v-list-item v-for="cake in groupedSortedByStock.piece" :key="cake.id" class="cake-list-item">
+                  <div class="d-flex justify-space-between align-center">
+                    <span class="cake-name">{{ cake.cakeInfo.name.substring(2) }}</span>
+                    <span class="stock-value">{{ cake.stock }}개</span>
+                  </div>
+                </v-list-item>
+              </template>
+
+              <template v-if="groupedSortedByStock.spoon.length > 0">
+                <div class="cake-group-header">떠먹는케이크</div>
+                <v-list-item v-for="cake in groupedSortedByStock.spoon" :key="cake.id" class="cake-list-item">
+                  <div class="d-flex justify-space-between align-center">
+                    <span class="cake-name">{{ cake.cakeInfo.name }}</span>
+                    <span class="stock-value">{{ cake.stock }}개</span>
+                  </div>
+                </v-list-item>
+              </template>
             </v-list>
           </v-card-text>
         </v-card>
@@ -107,19 +151,41 @@
               </div>
               <div class="dashboard-content">
                 <h3 class="text-h6 mb-1">부족 재고</h3>
-                <p class="text-h4 mb-0">{{ dashboardData.lowStock }}</p>
               </div>
             </div>
 
             <v-divider class="mb-3" />
 
             <v-list v-if="lowStockCakes.length > 0">
-              <v-list-item v-for="cake in lowStockCakes" :key="cake.id" class="cake-list-item">
-                <div class="d-flex justify-space-between align-center">
-                  <span class="cake-name">{{ cake.cakeInfo.name }}</span>
-                  <span class="stock-value error--text">{{ cake.stock }}개</span>
-                </div>
-              </v-list-item>
+              <template v-if="groupedLowStock.whole.length > 0">
+                <div class="cake-group-header">홀케이크</div>
+                <v-list-item v-for="cake in groupedLowStock.whole" :key="cake.id" class="cake-list-item">
+                  <div class="d-flex justify-space-between align-center">
+                    <span class="cake-name">{{ cake.cakeInfo.name }}</span>
+                    <span class="stock-value error--text">{{ cake.stock }}개</span>
+                  </div>
+                </v-list-item>
+              </template>
+
+              <template v-if="groupedLowStock.piece.length > 0">
+                <div class="cake-group-header">피스케이크</div>
+                <v-list-item v-for="cake in groupedLowStock.piece" :key="cake.id" class="cake-list-item">
+                  <div class="d-flex justify-space-between align-center">
+                    <span class="cake-name">{{ cake.cakeInfo.name.substring(2) }}</span>
+                    <span class="stock-value error--text">{{ cake.stock }}개</span>
+                  </div>
+                </v-list-item>
+              </template>
+
+              <template v-if="groupedLowStock.spoon.length > 0">
+                <div class="cake-group-header">떠먹는케이크</div>
+                <v-list-item v-for="cake in groupedLowStock.spoon" :key="cake.id" class="cake-list-item">
+                  <div class="d-flex justify-space-between align-center">
+                    <span class="cake-name">{{ cake.cakeInfo.name }}</span>
+                    <span class="stock-value error--text">{{ cake.stock }}개</span>
+                  </div>
+                </v-list-item>
+              </template>
             </v-list>
             <div v-else class="text-center pa-4 grey--text">
               부족 재고 항목이 없습니다
@@ -173,13 +239,6 @@ const deleteDialog = ref(false);
 const isLoading = ref(false);
 const authStore = useAuthStore();
 
-// 대시보드 데이터 상태 수정
-const dashboardData = ref({
-  totalCakeTypes: 0,
-  totalStock: 0,
-  lowStock: 0
-});
-
 const storeCakes = ref([]);
 
 // 재고 많은 순으로 정렬된 케이크 목록
@@ -193,6 +252,20 @@ const lowStockCakes = computed(() => {
     .filter(cake => cake.stock < 3)
     .sort((a, b) => a.stock - b.stock);
 });
+
+// 케이크 타입별로 분류하는 함수
+const groupCakesByType = (cakes) => {
+  return {
+    piece: cakes.filter(cake => cake.cakeInfo.name.startsWith('p.')),
+    spoon: cakes.filter(cake => cake.cakeInfo.name.startsWith('떠먹는')),
+    whole: cakes.filter(cake => !cake.cakeInfo.name.startsWith('p.') && !cake.cakeInfo.name.startsWith('떠먹는'))
+  };
+};
+
+// 각 섹션별 그룹화된 케이크 computed 속성
+const groupedCakes = computed(() => groupCakesByType(storeCakes.value));
+const groupedSortedByStock = computed(() => groupCakesByType(sortedByStock.value));
+const groupedLowStock = computed(() => groupCakesByType(lowStockCakes.value));
 
 // 매장 정보 가져오기
 const fetchStoreInfo = async () => {
@@ -213,12 +286,6 @@ const fetchDashboardData = async () => {
   try {
     const response = await api.get('/storeCakes');
     storeCakes.value = response.data;
-
-    dashboardData.value = {
-      totalCakeTypes: storeCakes.value.length,
-      totalStock: storeCakes.value.reduce((sum, cake) => sum + cake.stock, 0),
-      lowStock: storeCakes.value.filter(cake => cake.stock < 10).length
-    };
   } catch (error) {
     console.error('대시보드 데이터를 가져오는 중 오류 발생:', error);
   }
@@ -407,6 +474,23 @@ onMounted(async () => {
 
   .info-item .v-icon {
     margin-right: 0.5rem !important;
+  }
+}
+
+.cake-group-header {
+  background-color: #f5f5f5;
+  font-weight: bold;
+  color: #424242;
+  font-size: 0.95rem;
+  padding: 8px 16px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+@media (max-width: 600px) {
+  .cake-group-header {
+    font-size: 0.85rem;
+    padding: 6px 12px;
   }
 }
 </style>
