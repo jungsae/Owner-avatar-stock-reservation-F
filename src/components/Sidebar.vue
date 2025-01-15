@@ -7,7 +7,6 @@
         <span class="line" />
       </span>
     </v-btn>
-    <h1>{{ }}</h1>
   </v-app-bar>
 
   <!-- 사이드바 -->
@@ -44,7 +43,7 @@ const route = useRoute();
 const router = useRouter();
 
 const links = [
-  { text: '내 정보', to: '/myinfo', icon: 'mdi-account', roles: ['USER'] },
+  { text: '매장 정보', to: '/myinfo', icon: 'mdi-account', roles: ['USER'] },
   { text: '케이크 정보 관리', to: '/cakemanagement', icon: 'mdi-cake', roles: ['ADMIN'] },
   { text: '재고 관리', to: '/storeCakes', icon: 'mdi-cake', roles: ['USER'] },
   { text: '매장 리스트', to: '/storemanagement', icon: 'mdi-store', roles: ['ADMIN'] },
