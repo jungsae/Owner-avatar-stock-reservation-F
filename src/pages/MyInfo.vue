@@ -49,51 +49,72 @@
           <v-card-text>
             <div class="d-flex align-center mb-4">
               <div class="dashboard-icon primary">
-                <v-icon large color="white">mdi-cake-variant</v-icon>
+                <v-icon large color="white">mdi-view-dashboard</v-icon>
               </div>
               <div class="dashboard-content">
-                <h3 class="text-h6 mb-1">총 케이크 종류</h3>
+                <div class="d-flex align-center">
+                  <h3 class="text-h6 mb-1">오늘의 예약</h3>
+                  <v-chip class="ml-4" color="primary" small>
+                    {{ todayReservations.length }}건
+                  </v-chip>
+                </div>
               </div>
             </div>
 
             <v-divider class="mb-3" />
 
-            <v-list>
-              <template v-if="groupedCakes.whole.length > 0">
-                <div class="cake-group-header">홀케이크</div>
-                <v-list-item v-for="cake in groupedCakes.whole" :key="cake.id" class="cake-list-item">
-                  <div class="d-flex justify-space-between align-center">
-                    <span class="cake-name">{{ cake.cakeInfo.name }}</span>
-                    <span class="stock-value">{{ cake.stock }}개</span>
-                  </div>
-                </v-list-item>
+            <v-expansion-panels v-if="todayReservations.length > 0">
+              <template v-for="reservation in todayReservations" :key="reservation.id">
+                <v-expansion-panel>
+                  <template #title>
+                    <div class="d-flex justify-space-between align-center">
+                      <span>{{ reservation.customer_name }} - {{ formatTime(reservation.pickup_time) }}</span>
+                      <v-chip small :color="getStatusColor(reservation.status)" dark>
+                        {{ getStatusText(reservation.status) }}
+                      </v-chip>
+                    </div>
+                  </template>
+                  <template #text>
+                    <v-list dense>
+                      <v-list-item>
+                        <div>
+                          <div class="text-subtitle-1">주문 케이크</div>
+                          <div class="text-body-2 grey--text">{{ reservation.cake_name }}</div>
+                        </div>
+                      </v-list-item>
+                      <v-list-item>
+                        <div>
+                          <div class="text-subtitle-1">연락처</div>
+                          <div class="text-body-2 grey--text">{{ reservation.phone }}</div>
+                        </div>
+                      </v-list-item>
+                      <v-list-item>
+                        <div>
+                          <div class="text-subtitle-1">픽업 시간</div>
+                          <div class="text-body-2 grey--text">{{ formatDateTime(reservation.pickup_time) }}</div>
+                        </div>
+                      </v-list-item>
+                      <v-list-item v-if="reservation.memo">
+                        <div>
+                          <div class="text-subtitle-1">메모</div>
+                          <div class="text-body-2 grey--text">{{ reservation.memo }}</div>
+                        </div>
+                      </v-list-item>
+                    </v-list>
+                  </template>
+                </v-expansion-panel>
               </template>
-
-              <template v-if="groupedCakes.piece.length > 0">
-                <div class="cake-group-header">피스케이크</div>
-                <v-list-item v-for="cake in groupedCakes.piece" :key="cake.id" class="cake-list-item">
-                  <div class="d-flex justify-space-between align-center">
-                    <span class="cake-name">{{ cake.cakeInfo.name.substring(2) }}</span>
-                    <span class="stock-value">{{ cake.stock }}개</span>
-                  </div>
-                </v-list-item>
-              </template>
-
-              <template v-if="groupedCakes.spoon.length > 0">
-                <div class="cake-group-header">떠먹는케이크</div>
-                <v-list-item v-for="cake in groupedCakes.spoon" :key="cake.id" class="cake-list-item">
-                  <div class="d-flex justify-space-between align-center">
-                    <span class="cake-name">{{ cake.cakeInfo.name }}</span>
-                    <span class="stock-value">{{ cake.stock }}개</span>
-                  </div>
-                </v-list-item>
-              </template>
-            </v-list>
+            </v-expansion-panels>
+            <div v-else class="text-center pa-4 grey--text">
+              오늘의 예약이 없습니다
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
+    </v-row>
 
-      <v-col cols="12">
+    <v-row>
+      <v-col cols="12" md="6">
         <v-card class="dashboard-section mb-4">
           <v-card-text>
             <div class="d-flex align-center mb-4">
@@ -142,7 +163,7 @@
         </v-card>
       </v-col>
 
-      <v-col cols="12">
+      <v-col cols="12" md="6">
         <v-card class="dashboard-section">
           <v-card-text>
             <div class="d-flex align-center mb-4">
@@ -263,7 +284,6 @@ const groupCakesByType = (cakes) => {
 };
 
 // 각 섹션별 그룹화된 케이크 computed 속성
-const groupedCakes = computed(() => groupCakesByType(storeCakes.value));
 const groupedSortedByStock = computed(() => groupCakesByType(sortedByStock.value));
 const groupedLowStock = computed(() => groupCakesByType(lowStockCakes.value));
 
@@ -284,8 +304,12 @@ const fetchStoreInfo = async () => {
 // 대시보드 데이터 가져오기
 const fetchDashboardData = async () => {
   try {
-    const response = await api.get('/storeCakes');
-    storeCakes.value = response.data;
+    const [cakesResponse, reservationsResponse] = await Promise.all([
+      api.get('/storeCakes'),
+      api.get('/reservations/store')
+    ]);
+    storeCakes.value = cakesResponse.data;
+    reservations.value = reservationsResponse.data;
   } catch (error) {
     console.error('대시보드 데이터를 가져오는 중 오류 발생:', error);
   }
@@ -316,6 +340,56 @@ const deleteAccount = async () => {
 onMounted(async () => {
   await Promise.all([fetchStoreInfo(), fetchDashboardData()]);
 });
+
+const reservations = ref([]);
+
+// 오늘 날짜의 예약만 필터링
+const todayReservations = computed(() => {
+  const today = new Date().toISOString().split('T')[0];
+  return reservations.value.filter(reservation =>
+    reservation.pickup_time.startsWith(today)
+  );
+});
+
+// 시간 포맷 함수
+const formatTime = (datetime) => {
+  return new Date(datetime).toLocaleTimeString('ko-KR', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+const formatDateTime = (datetime) => {
+  return new Date(datetime).toLocaleString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+// 예약 상태에 따른 색상
+const getStatusColor = (status) => {
+  const colors = {
+    'pending': 'warning',
+    'confirmed': 'success',
+    'completed': 'info',
+    'cancelled': 'error'
+  };
+  return colors[status] || 'grey';
+};
+
+// 예약 상태 텍스트
+const getStatusText = (status) => {
+  const statusText = {
+    'pending': '대기중',
+    'confirmed': '확정',
+    'completed': '완료',
+    'cancelled': '취소'
+  };
+  return statusText[status] || '알 수 없음';
+};
 </script>
 
 <style scoped>
