@@ -131,9 +131,17 @@
             <v-list>
               <template v-if="groupedSortedByStock.whole.length > 0">
                 <div class="cake-group-header">홀케이크</div>
-                <v-list-item v-for="cake in groupedSortedByStock.whole" :key="cake.id" class="cake-list-item">
+                <v-list-item v-for="cake in groupedSortedByStock.whole" :key="cake.id" :class="[
+                  'cake-list-item',
+                  { 'low-stock-warning': cake.stock <= 5 }
+                ]">
                   <div class="d-flex justify-space-between align-center">
-                    <span class="cake-name">{{ cake.cakeInfo.name }}</span>
+                    <div class="d-flex align-center">
+                      <v-icon v-if="cake.stock <= 5" color="error" small class="mr-2">
+                        mdi-bell-alert
+                      </v-icon>
+                      <span class="cake-name">{{ cake.cakeInfo.name }}</span>
+                    </div>
                     <span class="stock-value">{{ cake.stock }}개</span>
                   </div>
                 </v-list-item>
@@ -141,9 +149,17 @@
 
               <template v-if="groupedSortedByStock.piece.length > 0">
                 <div class="cake-group-header">피스케이크</div>
-                <v-list-item v-for="cake in groupedSortedByStock.piece" :key="cake.id" class="cake-list-item">
+                <v-list-item v-for="cake in groupedSortedByStock.piece" :key="cake.id" :class="[
+                  'cake-list-item',
+                  { 'low-stock-warning': cake.stock <= 5 }
+                ]">
                   <div class="d-flex justify-space-between align-center">
-                    <span class="cake-name">{{ cake.cakeInfo.name.substring(2) }}</span>
+                    <div class="d-flex align-center">
+                      <v-icon v-if="cake.stock <= 5" color="error" small class="mr-2">
+                        mdi-bell-alert
+                      </v-icon>
+                      <span class="cake-name">{{ cake.cakeInfo.name.substring(2) }}</span>
+                    </div>
                     <span class="stock-value">{{ cake.stock }}개</span>
                   </div>
                 </v-list-item>
@@ -151,9 +167,17 @@
 
               <template v-if="groupedSortedByStock.spoon.length > 0">
                 <div class="cake-group-header">떠먹는케이크</div>
-                <v-list-item v-for="cake in groupedSortedByStock.spoon" :key="cake.id" class="cake-list-item">
+                <v-list-item v-for="cake in groupedSortedByStock.spoon" :key="cake.id" :class="[
+                  'cake-list-item',
+                  { 'low-stock-warning': cake.stock <= 5 }
+                ]">
                   <div class="d-flex justify-space-between align-center">
-                    <span class="cake-name">{{ cake.cakeInfo.name }}</span>
+                    <div class="d-flex align-center">
+                      <v-icon v-if="cake.stock <= 5" color="error" small class="mr-2">
+                        mdi-bell-alert
+                      </v-icon>
+                      <span class="cake-name">{{ cake.cakeInfo.name }}</span>
+                    </div>
                     <span class="stock-value">{{ cake.stock }}개</span>
                   </div>
                 </v-list-item>
@@ -171,7 +195,7 @@
                 <v-icon large color="white">mdi-alert-circle-outline</v-icon>
               </div>
               <div class="dashboard-content">
-                <h3 class="text-h6 mb-1">부족 재고</h3>
+                <h3 class="text-h6 mb-1">0개 이하</h3>
               </div>
             </div>
 
@@ -209,7 +233,7 @@
               </template>
             </v-list>
             <div v-else class="text-center pa-4 grey--text">
-              부족 재고 항목이 없습니다
+              항목이 없습니다
             </div>
           </v-card-text>
         </v-card>
@@ -262,15 +286,17 @@ const authStore = useAuthStore();
 
 const storeCakes = ref([]);
 
-// 재고 많은 순으로 정렬된 케이크 목록
+// 재고 많은 순으로 정렬된 케이크 목록 (재고가 0인 항목 제외)
 const sortedByStock = computed(() => {
-  return [...storeCakes.value].sort((a, b) => b.stock - a.stock);
+  return [...storeCakes.value]
+    .filter(cake => cake.stock > 0)  // 재고가 0보다 큰 항목만 필터링
+    .sort((a, b) => b.stock - a.stock);
 });
 
-// 부족 재고 케이크 목록 (10개 미만)
+// 부족 재고 케이크 목록 (0개)
 const lowStockCakes = computed(() => {
   return storeCakes.value
-    .filter(cake => cake.stock < 3)
+    .filter(cake => cake.stock < 1)  // 이미 0개 포함
     .sort((a, b) => a.stock - b.stock);
 });
 
@@ -499,8 +525,8 @@ const getStatusText = (status) => {
 }
 
 .cake-list-item {
-  border-bottom: 1px solid #e0e0e0;
-  padding: 8px 16px;
+  border-left: 4px solid transparent;
+  transition: all 0.3s ease;
 }
 
 .cake-list-item:last-child {
@@ -566,5 +592,13 @@ const getStatusText = (status) => {
     font-size: 0.85rem;
     padding: 6px 12px;
   }
+}
+
+.low-stock-warning {
+  background-color: rgba(244, 67, 54, 0.05) !important;
+}
+
+.cake-list-item {
+  transition: all 0.3s ease;
 }
 </style>
