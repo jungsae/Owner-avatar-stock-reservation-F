@@ -7,6 +7,46 @@
         <span class="line" />
       </span>
     </v-btn>
+
+    <v-spacer></v-spacer>
+
+    <v-menu v-model="showNotifications" :close-on-content-click="false" location="bottom end" offset="10">
+      <template v-slot:activator="{ props }">
+        <v-btn icon v-bind="props" class="notification-btn mr-2"
+          :class="{ 'has-notifications': notificationStore.unreadCount > 0 }">
+          <v-badge :content="notificationStore.unreadCount" :value="notificationStore.unreadCount" color="error">
+            <v-icon>mdi-bell</v-icon>
+          </v-badge>
+        </v-btn>
+      </template>
+
+      <v-card min-width="300" max-width="400" class="notification-menu">
+        <v-card-title class="d-flex justify-space-between align-center pa-4">
+          <span class="text-subtitle-1">알림</span>
+          <v-btn v-if="notificationStore.unreadCount > 0" variant="text" density="comfortable" size="small"
+            @click="notificationStore.markAllAsRead">
+            모두 읽음 표시
+          </v-btn>
+        </v-card-title>
+
+        <v-divider></v-divider>
+
+        <v-list v-if="notificationStore.notifications.length > 0" class="notification-list">
+          <v-list-item v-for="notification in notificationStore.notifications" :key="notification.id"
+            :class="{ 'unread': !notification.read }" @click="handleNotificationClick(notification)">
+            <div class="d-flex flex-column">
+              <div class="text-body-2">{{ notification.message }}</div>
+              <div class="text-caption text-grey">
+                {{ formatNotificationTime(notification.timestamp) }}
+              </div>
+            </div>
+          </v-list-item>
+        </v-list>
+        <v-card-text v-else class="text-center pa-4 text-grey">
+          새로운 알림이 없습니다
+        </v-card-text>
+      </v-card>
+    </v-menu>
   </v-app-bar>
 
   <!-- 사이드바 -->
@@ -22,8 +62,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useNotificationStore } from '@/stores/notification';
+import { initSSEConnection } from '@/services/sseService';
 
 const getUserRole = () => {
   const token = localStorage.getItem('token');
@@ -41,6 +83,9 @@ const getUserRole = () => {
 const drawer = ref(false);
 const route = useRoute();
 const router = useRouter();
+const notificationStore = useNotificationStore();
+const showNotifications = ref(false);
+let sseConnection = null;
 
 const links = [
   { text: '매장 정보', to: '/myinfo', icon: 'mdi-account', roles: ['USER'] },
@@ -68,6 +113,34 @@ const handleNavigation = (to) => {
 };
 
 const isActive = (path) => route.path === path;
+
+onMounted(() => {
+  sseConnection = initSSEConnection();
+});
+
+onUnmounted(() => {
+  if (sseConnection) {
+    sseConnection.close();
+  }
+});
+
+const handleNotificationClick = (notification) => {
+  notificationStore.markAsRead(notification.id);
+  if (notification.type === 'stock') {
+    router.push(`/storeCakes?cakeId=${notification.cakeId}`);
+  }
+  showNotifications.value = false;
+};
+
+const formatNotificationTime = (timestamp) => {
+  const date = new Date(timestamp);
+  return date.toLocaleString('ko-KR', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
 </script>
 
 <style scoped>
@@ -139,5 +212,44 @@ const isActive = (path) => route.path === path;
 .v-list-item.active {
   background-color: var(--v-theme-primary-lighten1);
   color: var(--v-theme-on-primary);
+}
+
+.notification-btn {
+  transition: transform 0.2s ease;
+}
+
+.notification-btn.has-notifications {
+  animation: shake 0.5s ease-in-out;
+}
+
+.notification-menu {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-list .v-list-item {
+  border-left: 3px solid transparent;
+  transition: background-color 0.2s ease;
+}
+
+.notification-list .v-list-item.unread {
+  background-color: rgba(var(--v-theme-primary), 0.05);
+  border-left-color: var(--v-theme-primary);
+}
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+
+  25% {
+    transform: rotate(10deg);
+  }
+
+  75% {
+    transform: rotate(-10deg);
+  }
 }
 </style>
