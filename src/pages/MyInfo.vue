@@ -55,7 +55,7 @@
                 <div class="d-flex align-center">
                   <h3 class="text-h6 mb-1">오늘의 예약</h3>
                   <v-chip class="ml-4" color="primary" small>
-                    {{ todayReservations.length }}건
+                    {{ reservations.length }}건
                   </v-chip>
                 </div>
               </div>
@@ -63,47 +63,156 @@
 
             <v-divider class="mb-3" />
 
-            <v-expansion-panels v-if="todayReservations.length > 0">
-              <template v-for="reservation in todayReservations" :key="reservation.id">
-                <v-expansion-panel>
-                  <template #title>
-                    <div class="d-flex justify-space-between align-center">
-                      <span>{{ reservation.customer_name }} - {{ formatTime(reservation.pickup_time) }}</span>
-                      <v-chip small :color="getStatusColor(reservation.status)" dark>
-                        {{ getStatusText(reservation.status) }}
-                      </v-chip>
-                    </div>
-                  </template>
-                  <template #text>
-                    <v-list dense>
-                      <v-list-item>
-                        <div>
-                          <div class="text-subtitle-1">주문 케이크</div>
-                          <div class="text-body-2 grey--text">{{ reservation.cake_name }}</div>
+            <v-expansion-panels v-if="reservations.length > 0">
+              <v-container fluid class="pa-0">
+                <v-row dense>
+                  <v-col v-for="reservation in reservations" :key="reservation.id" cols="12" :sm="6">
+                    <v-expansion-panel>
+                      <v-expansion-panel-title>
+                        <div class="d-flex justify-space-between align-center">
+                          <v-chip :size="$vuetify.display.xs ? 'x-small' : 'small'"
+                            :color="getStatusColor(reservation.pickup_status)" dark>
+                            {{ getStatusText(reservation.pickup_status) }}
+                          </v-chip>
+                          <span :class="[
+                            'ml-2',
+                            $vuetify.display.xs ? 'text-caption' :
+                              $vuetify.display.sm ? 'text-body-2' : 'text-body-1'
+                          ]">
+                            {{ reservation.customer_name }} - {{ reservation.pickup_time }}
+                          </span>
                         </div>
-                      </v-list-item>
-                      <v-list-item>
-                        <div>
-                          <div class="text-subtitle-1">연락처</div>
-                          <div class="text-body-2 grey--text">{{ reservation.phone }}</div>
-                        </div>
-                      </v-list-item>
-                      <v-list-item>
-                        <div>
-                          <div class="text-subtitle-1">픽업 시간</div>
-                          <div class="text-body-2 grey--text">{{ formatDateTime(reservation.pickup_time) }}</div>
-                        </div>
-                      </v-list-item>
-                      <v-list-item v-if="reservation.memo">
-                        <div>
-                          <div class="text-subtitle-1">메모</div>
-                          <div class="text-body-2 grey--text">{{ reservation.memo }}</div>
-                        </div>
-                      </v-list-item>
-                    </v-list>
-                  </template>
-                </v-expansion-panel>
-              </template>
+                      </v-expansion-panel-title>
+                      <v-expansion-panel-text>
+                        <v-container :class="[
+                          'pa-0',
+                          $vuetify.display.xs ? 'px-1' : 'px-2'
+                        ]">
+                          <v-row dense>
+                            <v-col cols="12">
+                              <v-list :density="$vuetify.display.xs ? 'compact' : undefined" class="pa-0">
+                                <!-- 케이크 정보 -->
+                                <v-list-item>
+                                  <v-card flat class="w-100" :class="[
+                                    $vuetify.display.xs ? 'pa-1' :
+                                      $vuetify.display.sm ? 'pa-2' : 'pa-3'
+                                  ]" color="grey-lighten-4">
+                                    <div class="d-flex flex-column">
+                                      <div :class="[
+                                        'font-weight-medium',
+                                        $vuetify.display.xs ? 'text-caption' :
+                                          $vuetify.display.sm ? 'text-subtitle-2' : 'text-subtitle-1'
+                                      ]">주문 케이크</div>
+                                      <div class="d-flex flex-column">
+                                        <div v-for="cake in reservation.cakes" :key="cake.id"
+                                          class="d-flex justify-space-between" :class="[
+                                            $vuetify.display.xs ? 'text-caption' :
+                                              $vuetify.display.sm ? 'text-body-2' : 'text-body-1'
+                                          ]">
+                                          <span>{{ cake.name }}</span>
+                                          <span>{{ cake.ReservationCake.quantity }}개</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </v-card>
+                                </v-list-item>
+
+                                <!-- 물품 정보 -->
+                                <v-list-item v-if="reservation.supplies && reservation.supplies[0].length > 0">
+                                  <v-card flat class="w-100" :class="[
+                                    $vuetify.display.xs ? 'pa-1' :
+                                      $vuetify.display.sm ? 'pa-2' : 'pa-3'
+                                  ]" color="grey-lighten-4">
+                                    <div class="d-flex flex-column">
+                                      <div :class="[
+                                        'font-weight-medium',
+                                        $vuetify.display.xs ? 'text-caption' :
+                                          $vuetify.display.sm ? 'text-subtitle-2' : 'text-subtitle-1'
+                                      ]">물품</div>
+                                      <div class="d-flex flex-column">
+                                        <div v-for="supply in reservation.supplies[0]" :key="supply.name"
+                                          class="d-flex justify-space-between" :class="[
+                                            $vuetify.display.xs ? 'text-caption' :
+                                              $vuetify.display.sm ? 'text-body-2' : 'text-body-1'
+                                          ]">
+                                          <span>{{ supply.name }}</span>
+                                          <span>{{ supply.quantity }}개</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </v-card>
+                                </v-list-item>
+
+                                <!-- 예약 상세 정보 -->
+                                <v-list-item>
+                                  <v-card flat class="w-100" color="grey-lighten-4">
+                                    <v-list :density="$vuetify.display.xs ? 'compact' : undefined" class="pa-0">
+                                      <v-list-item :density="$vuetify.display.xs ? 'compact' : undefined"
+                                        :class="$vuetify.display.xs ? 'py-0' : 'py-1'">
+                                        <template v-if="!$vuetify.display.xs" v-slot:prepend>
+                                          <v-icon size="small" class="mr-1">mdi-phone</v-icon>
+                                        </template>
+                                        <div class="d-flex align-center">
+                                          <span :class="[
+                                            'mr-2',
+                                            $vuetify.display.xs ? 'text-caption' :
+                                              $vuetify.display.sm ? 'text-body-2' : 'text-body-1'
+                                          ]">연락처:</span>
+                                          <span :class="[
+                                            $vuetify.display.xs ? 'text-caption' :
+                                              $vuetify.display.sm ? 'text-body-2' : 'text-body-1'
+                                          ]">{{ reservation.customer_phone }}</span>
+                                        </div>
+                                      </v-list-item>
+
+                                      <v-list-item :density="$vuetify.display.xs ? 'compact' : undefined"
+                                        :class="$vuetify.display.xs ? 'py-0' : 'py-1'">
+                                        <template v-if="!$vuetify.display.xs" v-slot:prepend>
+                                          <v-icon size="small" class="mr-1">mdi-clock-outline</v-icon>
+                                        </template>
+                                        <div class="d-flex align-center">
+                                          <span :class="[
+                                            'mr-2',
+                                            $vuetify.display.xs ? 'text-caption' :
+                                              $vuetify.display.sm ? 'text-body-2' : 'text-body-1'
+                                          ]">픽업:</span>
+                                          <span :class="[
+                                            $vuetify.display.xs ? 'text-caption' :
+                                              $vuetify.display.sm ? 'text-body-2' : 'text-body-1'
+                                          ]">{{ reservation.pickup_time }}</span>
+                                        </div>
+                                      </v-list-item>
+
+                                      <v-list-item v-if="reservation.request"
+                                        :density="$vuetify.display.xs ? 'compact' : undefined"
+                                        :class="$vuetify.display.xs ? 'py-0' : 'py-1'">
+                                        <template v-if="!$vuetify.display.xs" v-slot:prepend>
+                                          <v-icon size="small" class="mr-1">mdi-note-text-outline</v-icon>
+                                        </template>
+                                        <div class="d-flex flex-column">
+                                          <span :class="[
+                                            $vuetify.display.xs ? 'text-caption' :
+                                              $vuetify.display.sm ? 'text-body-2' : 'text-body-1'
+                                          ]">요청사항</span>
+                                          <span :class="[
+                                            'grey--text text-wrap',
+                                            $vuetify.display.xs ? 'text-caption' :
+                                              $vuetify.display.sm ? 'text-body-2' : 'text-body-1'
+                                          ]">{{ reservation.request }}</span>
+                                        </div>
+                                      </v-list-item>
+                                    </v-list>
+                                  </v-card>
+                                </v-list-item>
+                              </v-list>
+                            </v-col>
+                          </v-row>
+                        </v-container>
+                      </v-expansion-panel-text>
+                    </v-expansion-panel>
+                  </v-col>
+                </v-row>
+              </v-container>
             </v-expansion-panels>
             <div v-else class="text-center pa-4 grey--text">
               오늘의 예약이 없습니다
@@ -285,6 +394,7 @@ const isLoading = ref(false);
 const authStore = useAuthStore();
 
 const storeCakes = ref([]);
+const reservations = ref([]);
 
 // 재고 많은 순으로 정렬된 케이크 목록 (재고가 0인 항목 제외)
 const sortedByStock = computed(() => {
@@ -332,7 +442,7 @@ const fetchDashboardData = async () => {
   try {
     const [cakesResponse, reservationsResponse] = await Promise.all([
       api.get('/storeCakes'),
-      api.get('/reservations/store')
+      api.get(`/reservations/sort?startDate=${new Date().toISOString().split('T')[0]}&endDate=${new Date().toISOString().split('T')[0]}`)
     ]);
     storeCakes.value = cakesResponse.data;
     reservations.value = reservationsResponse.data;
@@ -366,34 +476,6 @@ const deleteAccount = async () => {
 onMounted(async () => {
   await Promise.all([fetchStoreInfo(), fetchDashboardData()]);
 });
-
-const reservations = ref([]);
-
-// 오늘 날짜의 예약만 필터링
-const todayReservations = computed(() => {
-  const today = new Date().toISOString().split('T')[0];
-  return reservations.value.filter(reservation =>
-    reservation.pickup_time.startsWith(today)
-  );
-});
-
-// 시간 포맷 함수
-const formatTime = (datetime) => {
-  return new Date(datetime).toLocaleTimeString('ko-KR', {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-};
-
-const formatDateTime = (datetime) => {
-  return new Date(datetime).toLocaleString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-};
 
 // 예약 상태에 따른 색상
 const getStatusColor = (status) => {
@@ -600,5 +682,15 @@ const getStatusText = (status) => {
 
 .cake-list-item {
   transition: all 0.3s ease;
+}
+
+@media (max-width: 600px) {
+  :deep(.v-list-item) {
+    min-height: unset !important;
+  }
+
+  :deep(.v-card) {
+    padding: 4px !important;
+  }
 }
 </style>
