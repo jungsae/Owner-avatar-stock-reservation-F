@@ -127,7 +127,7 @@ onUnmounted(() => {
 const handleNotificationClick = (notification) => {
   notificationStore.markAsRead(notification.id);
   if (notification.type === 'stock') {
-    router.push(`/storeCakes?cakeId=${notification.cakeId}`);
+    router.push('/storeCakes');
   }
   showNotifications.value = false;
 };
