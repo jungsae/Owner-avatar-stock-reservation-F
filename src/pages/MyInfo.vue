@@ -63,10 +63,10 @@
 
             <v-divider class="mb-3" />
 
-            <v-expansion-panels v-if="reservations.length > 0">
+            <v-expansion-panels v-if="reservations.length > 0" multiple>
               <v-container fluid class="pa-0">
                 <v-row dense>
-                  <v-col v-for="reservation in reservations" :key="reservation.id" cols="12" :sm="6">
+                  <v-col v-for="reservation in sortedReservations" :key="reservation.id" cols="12" :sm="6">
                     <v-expansion-panel>
                       <v-expansion-panel-title>
                         <div class="d-flex justify-space-between align-center">
@@ -395,6 +395,15 @@ const authStore = useAuthStore();
 
 const storeCakes = ref([]);
 const reservations = ref([]);
+
+// 시간순으로 정렬된 예약 목록
+const sortedReservations = computed(() => {
+  return [...reservations.value].sort((a, b) => {
+    const timeA = a.pickup_time.replace(':', '');
+    const timeB = b.pickup_time.replace(':', '');
+    return timeA - timeB;
+  });
+});
 
 // 재고 많은 순으로 정렬된 케이크 목록 (재고가 0인 항목 제외)
 const sortedByStock = computed(() => {
