@@ -6,7 +6,7 @@
   </transition>
   <v-container>
     <h1>
-      보유 재고
+      재고 현황
     </h1>
 
     <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="2000">
@@ -142,7 +142,7 @@
     <!-- 예약 현황 모달 -->
     <v-dialog v-model="reservationDialog" max-width="500px" height="500px">
       <v-card>
-        <v-card-title class="text-center">
+        <v-card-title class="text-center" style="background-color: #f5f5f5; padding: 10px;">
           {{ selectedCakeForReservation.cakeInfo.name }} 예약 현황
         </v-card-title>
         <v-card-text>

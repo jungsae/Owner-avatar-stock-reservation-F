@@ -49,7 +49,7 @@
           <v-card-text>
             <div class="d-flex align-center mb-4">
               <div class="dashboard-icon primary">
-                <v-icon large color="white">mdi-view-dashboard</v-icon>
+                <v-icon large color="blue">mdi-view-dashboard</v-icon>
               </div>
               <div class="dashboard-content">
                 <div class="d-flex align-center">
@@ -228,7 +228,7 @@
           <v-card-text>
             <div class="d-flex align-center mb-4">
               <div class="dashboard-icon success">
-                <v-icon large color="white">mdi-package-variant</v-icon>
+                <v-icon large color="black">mdi-package-variant</v-icon>
               </div>
               <div class="dashboard-content">
                 <h3 class="text-h6 mb-1">총 재고</h3>
@@ -301,7 +301,7 @@
           <v-card-text>
             <div class="d-flex align-center mb-4">
               <div class="dashboard-icon error">
-                <v-icon large color="white">mdi-alert-circle-outline</v-icon>
+                <v-icon large color="red">mdi-alert-circle-outline</v-icon>
               </div>
               <div class="dashboard-content">
                 <h3 class="text-h6 mb-1">0개 이하</h3>
